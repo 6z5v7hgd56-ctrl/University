@@ -26,27 +26,29 @@ object MainForm: TMainForm
   TextHeight = 32
   object NumberOneLabel: TLabel
     Left = 11
-    Top = 129
-    Width = 279
+    Top = 164
+    Width = 300
     Height = 32
     Margins.Left = 6
     Margins.Top = 6
     Margins.Right = 6
     Margins.Bottom = 6
-    Caption = #1042#1074#1077#1076#1080#1090#1077' '#1076#1083#1080#1085#1085#1091' '#1084#1072#1089#1089#1080#1074#1072':'
+    Caption = #1042#1074#1077#1076#1080#1090#1077' '#1087#1086#1088#1103#1076#1086#1082' '#1084#1072#1090#1088#1080#1094#1099':'
   end
   object TaskLabel: TLabel
     Left = 11
-    Top = 11
+    Top = 5
     Width = 1055
-    Height = 70
+    Height = 130
     Margins.Left = 6
     Margins.Top = 6
     Margins.Right = 6
     Margins.Bottom = 6
     AutoSize = False
     BiDiMode = bdLeftToRight
-    Caption = #1055#1088#1086#1075#1088#1072#1084#1084#1072' '#1089#1086#1088#1090#1080#1088#1091#1077#1090' '#1084#1072#1089#1089#1080#1074' '#1084#1077#1090#1086#1076#1086#1084' '#1077#1089#1090#1077#1089#1090#1074#1077#1085#1085#1086#1075#1086' '#1089#1083#1080#1103#1085#1080#1103'.'
+    Caption = 
+      #1042#1074#1086#1076#1080#1090#1089#1103' '#1076#1074#1091#1084#1077#1088#1085#1072#1103' '#1084#1072#1090#1088#1080#1094#1072' A '#1087#1086#1088#1103#1076#1082#1072' n. '#1055#1088#1086#1075#1088#1072#1084#1084#1072' '#1088#1072#1089#1089#1090#1072#1074#1083#1103#1077#1090' '#1101#1083 +
+      #1077#1084#1077#1085#1090#1099' '#1089#1090#1088#1086#1082' '#1089' '#1095#1105#1090#1085#1099#1084#1080' '#1085#1086#1084#1077#1088#1072#1084#1080' '#1084#1072#1090#1088#1080#1094#1099' '#1074' '#1087#1086#1088#1103#1076#1082#1077' '#1091#1073#1099#1074#1072#1085#1080#1103'.'
     Constraints.MaxHeight = 1000
     Constraints.MaxWidth = 1130
     Font.Charset = DEFAULT_CHARSET
@@ -63,7 +65,7 @@ object MainForm: TMainForm
   end
   object LabelResult: TLabel
     Left = 11
-    Top = 620
+    Top = 636
     Width = 400
     Height = 31
     Margins.Left = 6
@@ -71,12 +73,12 @@ object MainForm: TMainForm
     Margins.Right = 6
     Margins.Bottom = 6
     AutoSize = False
-    Caption = #1054#1090#1089#1086#1088#1090#1080#1088#1086#1074#1072#1085#1085#1099#1081' '#1084#1072#1089#1089#1080#1074':'
+    Caption = #1048#1079#1084#1077#1085#1105#1085#1085#1099#1081' '#1084#1072#1089#1089#1080#1074':'
     Visible = False
   end
   object ResultButton: TButton
-    Left = 530
-    Top = 122
+    Left = 480
+    Top = 155
     Width = 209
     Height = 49
     Margins.Left = 6
@@ -89,9 +91,9 @@ object MainForm: TMainForm
     OnClick = ResultButtonClick
   end
   object NumberOneEdit: TEdit
-    Left = 333
-    Top = 126
-    Width = 101
+    Left = 323
+    Top = 159
+    Width = 81
     Height = 40
     Hint = #1044#1083#1080#1085#1085#1072
     Margins.Left = 6
@@ -108,7 +110,7 @@ object MainForm: TMainForm
   end
   object StringGridA: TStringGrid
     Left = 11
-    Top = 183
+    Top = 208
     Width = 1041
     Height = 400
     Margins.Left = 6

@@ -27,13 +27,13 @@ object MainForm: TMainForm
   object NumberOneLabel: TLabel
     Left = 20
     Top = 129
-    Width = 279
+    Width = 265
     Height = 32
     Margins.Left = 6
     Margins.Top = 6
     Margins.Right = 6
     Margins.Bottom = 6
-    Caption = #1042#1074#1077#1076#1080#1090#1077' '#1076#1083#1080#1085#1085#1091' '#1084#1072#1089#1089#1080#1074#1072':'
+    Caption = #1042#1074#1077#1076#1080#1090#1077' '#1076#1083#1080#1085#1091' '#1084#1072#1089#1089#1080#1074#1072':'
   end
   object TaskLabel: TLabel
     Left = 20
@@ -89,7 +89,7 @@ object MainForm: TMainForm
     OnClick = ResultButtonClick
   end
   object NumberOneEdit: TEdit
-    Left = 333
+    Left = 319
     Top = 126
     Width = 101
     Height = 40

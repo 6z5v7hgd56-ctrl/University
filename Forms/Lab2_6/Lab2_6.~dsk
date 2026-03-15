@@ -73,9 +73,9 @@ BottomMiddelPanelData=0000080001020200000009000000446F636B5369746530100000004772
 [View0]
 CustomEditViewType=TEditView
 Module=C:\GitHub\University\Forms\Lab2_6\Unit1.pas
-CursorX=20
-CursorY=164
-TopLine=125
+CursorX=26
+CursorY=562
+TopLine=545
 LeftCol=1
 Elisions=
 Bookmarks=
