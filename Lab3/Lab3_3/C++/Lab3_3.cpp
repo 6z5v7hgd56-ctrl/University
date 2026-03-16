@@ -29,7 +29,8 @@ int readAndVerify(const int MIN_NUMBER, const int MAX_NUMBER, string myString)
             isIncorrect = true;
             cout << "Incorrect input, try again." << endl;
             cin.clear();
-            while (cin.get() != '\n');
+            while (cin.get() != '\n')
+                ;
         }
 
         if (!isIncorrect && ((number < MIN_NUMBER) || (number > MAX_NUMBER)))
@@ -106,20 +107,17 @@ bool checkMyFile(string filePath, bool isFileOutput)
         cout << "Error, file with path <" << filePath << "> is not exists or cannot be read." << endl;
         testFile.close();
     }
-    else 
-		if (!isFileText(filePath))
-        	cout << "Error, filename is not .txt" << endl;
-    	else 
-			if (!isFileOutput && !canRead(filePath))
-        		cout << "Error, no access to read the file." << endl;
-    		else 
-				if (isFileOutput && !canWrite(filePath))
-        			cout << "Error, no access to write into the file." << endl;
-    			else
-    			{
-        			checkInput = true;
-        			cout << "Assigning is completed successfully." << endl;
-    			}
+    else if (!isFileText(filePath))
+        cout << "Error, filename is not .txt" << endl;
+    else if (!isFileOutput && !canRead(filePath))
+        cout << "Error, no access to read the file." << endl;
+    else if (isFileOutput && !canWrite(filePath))
+        cout << "Error, no access to write into the file." << endl;
+    else
+    {
+        checkInput = true;
+        cout << "Assigning is completed successfully." << endl;
+    }
 
     testFile.close();
     return checkInput;
@@ -176,11 +174,10 @@ bool workWithConsoleOrFile(bool isOutput)
             cout << "The data is output to a file." << endl;
         else
             cout << "The data is entered from a file." << endl;
-    else 
-		if (isOutput)
-        	cout << "The data is output to the console." << endl;
-    	else
-        	cout << "The data is entered from the console." << endl;
+    else if (isOutput)
+        cout << "The data is output to the console." << endl;
+    else
+        cout << "The data is entered from the console." << endl;
 
     return isFromFile;
 }

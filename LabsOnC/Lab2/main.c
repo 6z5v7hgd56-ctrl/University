@@ -7,7 +7,7 @@ int main(void)
 {
     int* arr;
     size_t n;
-    int min, max, maxSeq;
+    int min, max, maxSeq, minSeq;
     long long sum;
 
     arr = NULL;
@@ -25,7 +25,7 @@ int main(void)
     // 1
     printf("\n====1====\n");
     analyze(arr, n, &min, &max, &sum);
-    printf("%d  %d  %d\n", min, max, sum);
+    printf("%d  %d  %lld\n", min, max, sum);
 
     // 2
     printf("\n====2====\n");
@@ -35,7 +35,18 @@ int main(void)
     // 3
     printf("\n====3====\n");
     maxSeq = maxSequentially(arr, n);
-    printf("%d", maxSeq);
+    printf("%d\n", maxSeq);
+
+    // 4
+    printf("\n====4====\n");
+    minSeq = minSequentially(arr, n);
+    printf("%d\n", minSeq);
+
+    // 5
+    printf("\n====5====\n");
+    sort(&arr, n);
+    writeArray(arr, n);
+
 
     free(arr);
     arr = NULL;
