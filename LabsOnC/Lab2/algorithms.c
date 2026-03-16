@@ -90,9 +90,49 @@ void filter(int** arr, size_t* n)
     }
     else
     {
-        printf("gege");
         *arr = temp;
+        *n = newLength;
     }
     
-    free(temp);
+}
+
+int maxSequentially(const int arr[], const size_t n)
+{ 
+    size_t i, j;
+    int sum, max;
+
+    sum = 0;
+    max = 0;
+    
+    if (n == 0 || arr == NULL)
+    {
+        printf("Невозмоно провести операцию нахождения суммы подряд идущих элементов так как массив имеет длину 0.\n");
+    }
+    else    
+        if (k == 0 || k > n)
+        {
+            printf("Невозмоно провести операцию нахождения суммы подряд идущих элементов из-за некорректрой длины скользящего окна k.\n");    
+        }
+        else 
+        {
+            for (i = 0; i < n - k + 1; i++)
+            {
+                sum = 0;
+                for (j = i; j < i + k; j++)
+                {
+                    if (i == 0)
+                    {
+                        max = max + arr[j];
+                    }
+                    else
+                    {
+                        sum = sum + arr[j]; 
+                        if (j == i + k - 1 && sum > max) 
+                            max = sum;
+                    } 
+                } 
+            }    
+        }
+
+    return max;
 }

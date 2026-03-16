@@ -11,5 +11,6 @@ void fillArray(int** arr, size_t* n);
 void writeArray(const int arr[], const size_t n);
 void analyze(const int* arr, size_t n, int* min, int* max, long long* sum);
 void filter(int** arr, size_t* n);
+int maxSequentially(const int arr[], const size_t n);
 
 #endif  
