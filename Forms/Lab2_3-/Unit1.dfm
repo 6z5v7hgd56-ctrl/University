@@ -123,7 +123,6 @@ object MainForm: TMainForm
     DefaultRowHeight = 40
     RowCount = 2
     Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goEditing, goTabs, goThumbTracking, goFixedRowDefAlign]
-    ScrollBars = ssHorizontal
     TabOrder = 2
     Visible = False
     OnExit = StringGridAExit
@@ -146,7 +145,6 @@ object MainForm: TMainForm
     Enabled = False
     RowCount = 2
     Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goEditing, goThumbTracking, goFixedRowDefAlign]
-    ScrollBars = ssHorizontal
     TabOrder = 3
     Visible = False
     OnExit = StringGridAExit

@@ -54,7 +54,7 @@ BorlandEditorCodeExplorer=BorlandEditorCodeExplorer@EditWindow0
 TopPanelSize=0
 LeftPanelSize=1895
 LeftPanelClients=PropertyInspector,DockSite3
-LeftPanelData=000008000101000000001F150000000000000167070000000000000100000000580E000009000000446F636B53697465330100000000CB2100001100000050726F7065727479496E73706563746F72FFFFFFFF
+LeftPanelData=000008000101000000001F1500000000000001670700000000000001000000008B02000009000000446F636B53697465330100000000CB2100001100000050726F7065727479496E73706563746F72FFFFFFFF
 RightPanelSize=1999
 RightPanelClients=DockSite2,DockSite4
 RightPanelData=000008000101000000001F1500000000000001CF0700000000000001000000004A12000009000000446F636B53697465320100000000CB21000009000000446F636B5369746534FFFFFFFF
@@ -208,13 +208,13 @@ Visible=1
 Docked=1
 State=0
 Left=0
-Top=753
+Top=173
 Width=1895
-Height=4882
+Height=8000
 MaxLeft=-1
 MaxTop=-1
 ClientWidth=1895
-ClientHeight=4882
+ClientHeight=8000
 TBDockHeight=8672
 LRDockWidth=1895
 Dockable=1
@@ -223,8 +223,8 @@ SplitPos=111
 
 [PropInspDesignerSelection]
 ArrangeBy=Name
-SelectedItem=Caption,
-ExpandedItems=Anchors=0,Constraints=0,BorderIcons=0,CustomTitleBar=0
+SelectedItem=Options.goTabs,
+ExpandedItems=Anchors=0,Constraints=1,Font=0,BorderIcons=0,CustomTitleBar=0,GlassFrame=0,HorzScrollBar=0,LiveBindings=0,"LiveBindings Designer=0",Margins=0,Menu=0,Padding=0,StyleElements=0,Touch=0,VertScrollBar=0,Touch.InteractiveGestureOptions=0,Touch.InteractiveGestures=0,Touch.TabletOptions=0,BevelEdges=0,Options=1
 
 [frmDesignPreview]
 PercentageSizes=1
@@ -320,8 +320,8 @@ TBDockHeight=360
 LRDockWidth=273
 Dockable=1
 StayOnTop=0
-Name=60
-Description=167
+Name=30
+Description=84
 filter=1
 
 [DebugLogView]
@@ -561,11 +561,11 @@ State=0
 Left=0
 Top=0
 Width=1895
-Height=3446
+Height=328
 MaxLeft=-1
 MaxTop=-1
 ClientWidth=1895
-ClientHeight=3446
+ClientHeight=328
 TBDockHeight=3677
 LRDockWidth=1895
 Dockable=1
@@ -695,11 +695,11 @@ State=0
 Left=0
 Top=48
 Width=1895
-Height=3446
+Height=328
 MaxLeft=-1
 MaxTop=-1
 ClientWidth=1895
-ClientHeight=3446
+ClientHeight=328
 TBDockHeight=8672
 LRDockWidth=1895
 Dockable=1
