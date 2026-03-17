@@ -5,17 +5,30 @@
 void fillArray(int **arr, size_t *n)
 {
     size_t i;
+    int testLen;
 
     *n = 0;
+    testLen = 0;
 
     printf("Введите длину массива: ");
-    scanf("%zu", &*n);
+    scanf("%d", &testLen);
 
-    *arr = (int *)malloc(*n * sizeof(int));
-
-    for (i = 0; i < *n; i++)
+    if (testLen > 0)
     {
-        scanf("%d", &(*arr)[i]);
+        *n = testLen;
+        *arr = (int*)malloc(*n * sizeof(int));
+
+        for (i = 0; i < *n; i++)
+        {
+            printf("Элемент [%zu]: ", i + 1);
+            scanf("%d", &(*arr)[i]);
+        }
+    }
+    else
+    {
+        printf("Ошибка, не положительная длина массива.\n");
+        *arr = NULL;
+        *n = 0;
     }
 }
 
@@ -33,7 +46,7 @@ void writeArray(const int arr[], const size_t n)
         printf("\n");
     }
     else
-        printf("Ошибка состояния массива.");
+        printf("Ошибка состояния массива.\n");
 }
 
 void analyze(const int *arr, size_t n, int *min, int *max, long long *sum)
@@ -79,8 +92,6 @@ void filter(int **arr, size_t *n)
         }
     }
 
-    printf("%zu\n", newLength);
-
     temp = (int *)realloc(*arr, newLength * sizeof(int));
 
     if ((temp) == NULL)
@@ -108,7 +119,7 @@ int maxSequentially(const int arr[], const size_t n)
     }
     else if (k == 0 || k > n)
     {
-        printf("Невозмоно провести операцию нахождения суммы подряд идущих элементов из-за некорректрой длины скользящего окна k.\n");
+        printf("Невозмоно провести операцию нахождения суммы подряд идущих элементов из-за несоответствия длины скользящего окна k и длинны массива n.\n");
     }
     else
     {
@@ -162,7 +173,7 @@ int minSequentially(const int *arr, size_t n)
     if (min_len == n + 1)
     {
         min_len = -1;
-        printf("Ошибка при поиске минимальной длины массива, сумма элементов которого будет меньше чем та, что задана в условии варианта.\n");
+        printf("Ошибка при поиске минимальной длины массива, сумма элементов которого будет больше чем та, что задана в условии варианта.\n");
     }
 
     return (int)min_len;
@@ -189,7 +200,55 @@ void sort(int **arr, size_t n)
 
             (*arr)[j + 1] = key;
         }
-
-        writeArray(*arr, n);
     }
+}
+
+void output1(int *arr, size_t n)
+{
+    int min, max;
+    long long sum;
+
+    min = 0;
+    max = 0;
+    sum = 0ll;
+
+    printf("\n====Анализ====\n");
+    analyze(arr, n, &min, &max, &sum);
+    printf("Минимальное значение массивa: %d\nМаксимальное значение массива: %d\nСуммa элементов: %lld\n", min, max, sum);
+}
+
+void output2(int **arr, size_t *n)
+{
+    printf("\n====Фильтрация====\n");
+    filter(&(*arr), &(*n));
+    printf("Элементы, удовлетворяющие условию варианта: ");
+    writeArray(*arr, *n);
+    printf("Новый размер массива: %zu\n", *n);
+}
+
+void output3(int *arr, size_t n)
+{
+    int maxSeq;
+    maxSeq = 0;
+
+    printf("\n====Максимальная_сумма====\n");
+    maxSeq = maxSequentially(arr, n);
+    printf("%d\n", maxSeq);
+}
+
+void output4(int *arr, size_t n)
+{
+    int minSeq;
+    minSeq = 0;
+
+    printf("\n====Длинна_минимального_подотрезка====\n");
+    minSeq = minSequentially(arr, n);
+    printf("%d\n", minSeq);
+}
+
+void output5(int **arr, size_t *n)
+{
+    printf("\n====Сортировка====\n");
+    sort(&(*arr), *n);
+    writeArray(*arr, *n);
 }
