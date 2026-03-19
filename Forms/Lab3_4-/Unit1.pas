@@ -96,7 +96,7 @@ Const
 
 Var
     MainForm: TMainForm;
-    IsDataSaved: Boolean = True;
+    IsSaveDoNotNeeded: Boolean = True;
 
 Implementation
 
@@ -297,6 +297,7 @@ Begin
         FixedEdit.SelStart := SelStart;
     End;
 
+    IsSaveDoNotNeeded := True;
 End;
 
 Procedure TMainForm.EditStringKeyPress(Sender: TObject; Var Key: Char);
@@ -353,7 +354,7 @@ Begin
 
     LabelResult.Caption := 'Результат: ';
     LabelResult.Visible := True;
-    IsDataSaved := False;
+    IsSaveDoNotNeeded := False;
     MainForm.SaveTab.Enabled := True;
 
     StrText := '';
@@ -396,7 +397,7 @@ Begin
         If Error = EcNO_ERRORS Then
         Begin
             Error := ReadAndWriteOutFileData(OpenedFile);
-            IsDataSaved := True;
+            IsSaveDoNotNeeded := True;
         End;
         If Error <> EcNO_ERRORS Then
             Application.MessageBox(PWideChar(ERROR_TEXT[Error]), 'Ошибка', MB_OK + MB_ICONERROR);
@@ -427,7 +428,7 @@ Var
 Begin
     InstructionForm := TGuideForm.Create(Self);
     InstructionForm.GuideLabel.Caption :=
-        '1) Строка принимает символы из множества [''0''..''9'', ''a''..''z'', ''A''..''Z'', ''+'', ''-'', ''='', ''*'', ''/'', '':'', '';'', ''('', '')'']'#13#10 +
+        '1) Строка принимает символы из множества [''0''..''9'', ''a''..''z'', ''A''..''Z'', ''+'', ''-'', ''='', ''*'', ''/'', '':'', '';'', ''('', '')'', ''.'', '','']'#13#10 +
         '2) Примеры отсутствия баланса скобок: ''..)..()..(..'', ''..()()(..''.'#13#10;
     InstructionForm.GuideLabel.Font.Size := 10;
     InstructionForm.Caption := 'Инструкция';
@@ -470,7 +471,7 @@ Begin
         Else
         Begin
             Application.MessageBox(PWideChar('Данные успешно сохранены.'), 'Успешно', MB_OK + MB_ICONINFORMATION);
-            IsDataSaved := True;
+            IsSaveDoNotNeeded := True;
         End;
 
     End
@@ -596,7 +597,7 @@ Begin
     Error := EcNO_ERRORS;
     CanClose := False;
 
-    If (IsDataSaved) Then
+    If (IsSaveDoNotNeeded) Then
     Begin
         IsFormShouldClose := Application.MessageBox(PChar('Вы хотите выйти?'), PChar('Выход'), MB_YESNO + MB_ICONQUESTION);
 
