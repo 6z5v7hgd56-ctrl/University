@@ -8,7 +8,11 @@ int main(void)
     int* arr;
     size_t n;
 
+    arr = NULL;
+    n = 0;
+
     setlocale(LC_ALL, "Russian");
+    printMy();
     fillArray(&arr, &n);
     printf("¬ведЄнный массив: ");
     writeArray(arr, n);

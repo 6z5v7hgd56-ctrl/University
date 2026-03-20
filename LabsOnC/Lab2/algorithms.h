@@ -21,5 +21,6 @@ void output2(int** arr, size_t* n);
 void output3(int* arr, size_t n);
 void output4(int* arr, size_t n);
 void output5(int** arr, size_t* n);
+void printMy();
 
 #endif  

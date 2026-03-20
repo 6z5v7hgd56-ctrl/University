@@ -221,6 +221,7 @@ void output2(int **arr, size_t *n)
 {
     printf("\n====Фильтрация====\n");
     filter(&(*arr), &(*n));
+    printf("Удаляемый элемент: %d\n", x);
     printf("Элементы, удовлетворяющие условию варианта: ");
     writeArray(*arr, *n);
     printf("Новый размер массива: %zu\n", *n);
@@ -233,6 +234,7 @@ void output3(int *arr, size_t n)
 
     printf("\n====Максимальная_сумма====\n");
     maxSeq = maxSequentially(arr, n);
+    printf("k: %d\n", k);
     printf("%d\n", maxSeq);
 }
 
@@ -243,6 +245,7 @@ void output4(int *arr, size_t n)
 
     printf("\n====Длинна_минимального_подотрезка====\n");
     minSeq = minSequentially(arr, n);
+    printf("S: %d\n", s);
     printf("%d\n", minSeq);
 }
 
@@ -251,4 +254,9 @@ void output5(int **arr, size_t *n)
     printf("\n====Сортировка====\n");
     sort(&(*arr), *n);
     writeArray(*arr, *n);
+}
+
+void printMy()
+{
+    printf("x = 11, k = 4, S = 19\n");
 }
