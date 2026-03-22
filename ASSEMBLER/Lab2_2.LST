@@ -1,0 +1,34 @@
+  ADDR B1 B2 B3 B4 C:\GitHub\University\ASSEMBLER\Lab2_2.asm        PAGE       1
+
+                           ORG     $8000
+
+  8000 18 CE 00 00         LDY     #0
+  8004 4F                  CLRA
+  8005 5F                  CLRB
+  8006 CE 82 00            LDX     #$8200
+  8009 C6 00               LDAB    #0
+
+                   again:
+  800B 8C 83 00            CPX #$8300
+  800E 2A 0E               BPL done
+  8010 4F                  CLRA
+  8011 A6 00               LDAA ,X
+  8013 2F 06               BLE next
+  8015 37                  PSHB
+  8016 16                  TAB
+  8017 18 3A               ABY
+  8019 33                  PULB
+  801A 5C                  INCB
+
+                   next:
+  801B 08                  INX
+  801C 26 ED               BNE     again
+
+  801E 17          done:   TBA
+  801F 20 FE               BRA     *
+
+  Symbol Table 
+
+  DONE               801E
+  AGAIN              800B
+  NEXT               801B

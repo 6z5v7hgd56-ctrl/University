@@ -1,0 +1,34 @@
+  ADDR B1 B2 B3 B4 C:\GitHub\University\ASSEMBLER\Test 2.asm        PAGE       1
+
+                           ORG   $8000
+
+                   main:
+  8000 18 CE 00 00         ldy   #0
+  8004 4F                  clra
+
+  8005 CE 82 00            ldx   #$8200
+  8008 C6 00               ldab  #$00
+
+                   again:
+  800A A6 00               ldaa  ,x
+  800C 2F 05               ble   next
+  800E 17                  tba
+  800F 4F                  clra
+  8010 18 3A               aby
+
+  8012 4C                  inca
+
+                   next:
+  8013 08                  inx
+  8014 5A                  decb
+  8015 26 F3               bne   again
+
+                   forever:
+  8017 20 FE               bra   forever
+
+  Symbol Table 
+
+  AGAIN              800A
+  MAIN               8000
+  FOREVER            8017
+  NEXT               8013

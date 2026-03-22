@@ -1,0 +1,17 @@
+  ADDR B1 B2 B3 B4 C:\GitHub\University\ASSEMBLER\Eraser Memory     PAGE       1
+
+                           ORG   $8000
+
+  8000 CE 82 00            ldx   #$8200
+
+                   loop:
+  8003 6F 00               clr   ,x
+  8005 08                  inx
+  8006 8C 83 00            cpx   #$8300
+  8009 26 F8               bne   loop
+
+  800B 20 FE               bra   *
+
+  Symbol Table 
+
+  LOOP               8003

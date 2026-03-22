@@ -10,17 +10,17 @@ Type
     UnidirNode = ^UniElement;
 
     UniElement = Record
-        Data: Integer;
-        Power: Integer;
+        Data: Int64;
+        Power: Int64;
         Next: UnidirNode;
     End;
 
-    TArrayOI = Array Of Integer;
+    TArrayOI = Array Of Int64;
 
-Function ReadAndVerify(Const MIN_NUMBER, MAX_NUMBER: Integer; MyString: String; Var IsStop: Boolean): Integer;
+Function ReadAndVerify(Const MIN_NUMBER, MAX_NUMBER: Int64; MyString: String; Var IsStop: Boolean): Int64;
 Var
     IsCorrect: Boolean;
-    Number: Integer;
+    Number: Int64;
     NumberStr: String;
 Begin
     IsCorrect := True;
@@ -84,7 +84,7 @@ Begin
     End;
 End;
 
-Procedure Append(Numb, Pow: Integer; Head: UnidirNode);
+Procedure Append(Numb, Pow: Int64; Head: UnidirNode);
 Var
     Temp: UnidirNode;
 Begin
@@ -126,27 +126,28 @@ Begin
     Equality := IsEqual;
 End;
 
-Function Power(Number, Pow: Integer): Integer;
+Function Power(Number, Pow: Int64): Int64;
 Var
-    I: Integer;
+    I, Answer: Int64;
 Begin
     Power := -1;
+    Answer := Number;
 
     If Pow = 1 Then
-        Number := Number
+        Answer := Number
     Else
         If (Pow = 0) And (Number <> 0) Then
-            Number := 1;
+            Answer := 1;
 
     For I := 2 To Pow Do
-        Number := Number * Number;
+        Answer := Answer * Number;
 
-    Power := Number
+    Power := Answer;
 End;
 
-Function Meaning(Head: UnidirNode; Number: Integer): Integer;
+Function Meaning(Head: UnidirNode; Number: Int64): Int64;
 Var
-    Answer: Integer;
+    Answer: Int64;
     Temp: UnidirNode;
 Begin
     Answer := 0;
@@ -207,7 +208,7 @@ End;
 
 Var
     UniHeadP, UniHeadS, UniHeadAnswer: UnidirNode;
-    Number, Pow, X: Integer;
+    Number, Pow, X: Int64;
     Arr: TArrayOI;
     IsStop: Boolean;
 
@@ -251,6 +252,8 @@ Begin
     Until IsStop;
 
     IsStop := False;
+
+    Writeln(power(5, 5));
 
     WriteLn(#13#10'Воспроизведение многочлена P: '#13#10);
     Print(UniHeadP, 'P(x) = ');

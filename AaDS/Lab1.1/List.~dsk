@@ -40,8 +40,8 @@ MaxLeft=-1
 MaxTop=-1
 ClientWidth=9896
 ClientHeight=8930
-TBDockHeight=13398
-LRDockWidth=12070
+TBDockHeight=8930
+LRDockWidth=9896
 Dockable=1
 StayOnTop=0
 DockedToMainForm=1
@@ -54,7 +54,7 @@ RightPanelSize=1999
 RightPanelClients=DockSite2,DockSite4
 RightPanelData=00000800010100000000411100000000000001CF0700000000000001000000004A12000009000000446F636B536974653201000000009C1B000009000000446F636B5369746534FFFFFFFF
 BottomPanelSize=1500
-BottomPanelClients=DockSite1,MessageView
+BottomPanelClients=MessageView,DockSite1
 BottomPanelData=0000080001020100000009000000446F636B5369746531D93D00000000000002DC050000000000000100000000D93D00000F0000004D65737361676556696577466F726DFFFFFFFF
 BottomMiddlePanelSize=0
 BottomMiddlePanelClients=DockSite0,GraphDrawingModel
@@ -63,11 +63,11 @@ BottomMiddelPanelData=0000080001020200000009000000446F636B5369746530100000004772
 [View0]
 CustomEditViewType=TEditView
 Module=C:\GitHub\University\AaDS\Lab1.1\List.dpr
-CursorX=73
-CursorY=353
-TopLine=331
+CursorX=51
+CursorY=209
+TopLine=236
 LeftCol=1
-Elisions={{90,38},{99,3},{''}}{{305,37},{311,3},{''}}{{313,37},{319,3},{''}}
+Elisions=
 Bookmarks=
 EditViewName=C:\GitHub\University\AaDS\Lab1.1\List.dpr
 
@@ -96,8 +96,7 @@ Dockable=1
 StayOnTop=0
 
 [Breakpoints]
-Count=1
-Breakpoint0='C:\GitHub\University\AaDS\Lab1.1\List.dpr',350,'',0,1,'',1,0,0,'',1,'','','',0,''
+Count=0
 
 [EmbarcaderoWin32Debugger_AddressBreakpoints]
 Count=0
@@ -200,7 +199,7 @@ TBDockHeight=9011
 LRDockWidth=1895
 Dockable=1
 StayOnTop=0
-SplitPos=111
+SplitPos=116
 
 [frmDesignPreview]
 PercentageSizes=1
@@ -620,7 +619,7 @@ Create=1
 Visible=0
 Docked=1
 State=0
-Left=0
+Left=1520
 Top=48
 Width=3822
 Height=1419

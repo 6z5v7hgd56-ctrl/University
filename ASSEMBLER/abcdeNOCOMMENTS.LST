@@ -1,0 +1,27 @@
+  ADDR B1 B2 B3 B4 thrass11.tmp                                     PAGE       1
+
+                           ORG     $8000
+
+  8000 18 CE 00 00         LDY     #0
+  8004 4F                  CLRA
+  8005 CE 82 00            LDX     #$8200
+  8008 C6 00               LDAB    #0
+
+                   again:
+  800A A6 00               LDAA    ,X
+  800C 2F 04               BLE     next
+  800E 16                  TAB
+  800F 18 3A               ABY
+  8011 4C                  INCA
+                   next:
+  8012 08                  INX
+  8013 5A                  DECB
+  8014 26 F4               BNE     again
+
+  8016 17                  TBA
+  8017 20 FE               BRA     *
+
+  Symbol Table 
+
+  AGAIN              800A
+  NEXT               8012

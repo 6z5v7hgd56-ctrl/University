@@ -16,7 +16,7 @@ void fillArray(int **arr, size_t *n)
     if (testLen > 0)
     {
         *n = testLen;
-        *arr = (int*)malloc(*n * sizeof(int));
+        *arr = (int *)malloc(*n * sizeof(int));
 
         for (i = 0; i < *n; i++)
         {
@@ -179,15 +179,44 @@ int minSequentially(const int *arr, size_t n)
     return (int)min_len;
 }
 
-void sort(int **arr, size_t n)
+void deleteRepetitions(int **arr, size_t *n)
+{
+    int i, j, arrLen;
+    _Bool isNotSorted;
+    isNotSorted = 1;
+    arrLen = *n;
+
+    while (isNotSorted)
+    {
+        isNotSorted = 0;
+        for (i = 0; i < arrLen - 1; ++i)
+        {
+            j = i + 1;
+
+            if ((*arr)[i] == (*arr)[j])
+            {
+                while (j < *n)
+                {
+                    (*arr)[j] = (*arr)[j + 1];
+                    j++;
+                }
+                (*n)--;
+                arrLen--;
+                isNotSorted = 1;
+            }
+        }
+    }
+}
+
+void sort(int **arr, size_t *n)
 {
     int i, j, key;
 
     key = 0;
 
-    if ((*arr) != NULL && n > 1)
+    if ((*arr) != NULL && *n > 1)
     {
-        for (i = 1; i < n; i++)
+        for (i = 1; i < *n; i++)
         {
             key = (*arr)[i];
             j = i - 1;
@@ -200,7 +229,14 @@ void sort(int **arr, size_t n)
 
             (*arr)[j + 1] = key;
         }
+
+        for (i = 1; i < *n; i++)
+        {
+            key = (*arr)[i];
+            j = i - 1;
+        }
     }
+    deleteRepetitions(arr, n);
 }
 
 void output1(int *arr, size_t n)
@@ -243,7 +279,7 @@ void output4(int *arr, size_t n)
     int minSeq;
     minSeq = 0;
 
-    printf("\n====Длинна_минимального_подотрезка====\n");
+    printf("\n====Длина_минимального_подотрезка====\n");
     minSeq = minSequentially(arr, n);
     printf("S: %d\n", s);
     printf("%d\n", minSeq);
@@ -252,7 +288,7 @@ void output4(int *arr, size_t n)
 void output5(int **arr, size_t *n)
 {
     printf("\n====Сортировка====\n");
-    sort(&(*arr), *n);
+    sort(&(*arr), &(*n));
     writeArray(*arr, *n);
 }
 

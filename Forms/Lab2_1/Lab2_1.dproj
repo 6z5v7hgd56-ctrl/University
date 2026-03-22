@@ -127,7 +127,6 @@
         </DelphiCompile>
         <DCCReference Include="Unit1.pas">
             <Form>MainForm</Form>
-            <FormType>dfm</FormType>
         </DCCReference>
         <DCCReference Include="Unit2.pas">
             <Form>GuideForm</Form>
