@@ -149,6 +149,7 @@ int minSequentially(const int *arr, size_t n)
 {
     size_t left, right, min_len, len;
     int current_sum;
+    int* 
 
     left = 0;
     min_len = n + 1;
@@ -205,6 +206,19 @@ void deleteRepetitions(int **arr, size_t *n)
                 isNotSorted = 1;
             }
         }
+    }
+
+
+    temp = (int *)realloc(*arr, newLength * sizeof(int));
+
+    if ((temp) == NULL)
+    {
+        printf("Ошибка при изменении размера массива.");
+    }
+    else
+    {
+        *arr = temp;
+        *n = newLength;
     }
 }
 
