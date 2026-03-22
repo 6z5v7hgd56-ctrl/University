@@ -149,7 +149,6 @@ int minSequentially(const int *arr, size_t n)
 {
     size_t left, right, min_len, len;
     int current_sum;
-    int* 
 
     left = 0;
     min_len = n + 1;
@@ -184,6 +183,9 @@ void deleteRepetitions(int **arr, size_t *n)
 {
     int i, j, arrLen;
     _Bool isNotSorted;
+    int* temp;
+
+    temp = NULL;
     isNotSorted = 1;
     arrLen = *n;
 
@@ -201,7 +203,6 @@ void deleteRepetitions(int **arr, size_t *n)
                     (*arr)[j] = (*arr)[j + 1];
                     j++;
                 }
-                (*n)--;
                 arrLen--;
                 isNotSorted = 1;
             }
@@ -209,7 +210,7 @@ void deleteRepetitions(int **arr, size_t *n)
     }
 
 
-    temp = (int *)realloc(*arr, newLength * sizeof(int));
+    temp = (int *)realloc(*arr, arrLen * sizeof(int));
 
     if ((temp) == NULL)
     {
@@ -218,7 +219,7 @@ void deleteRepetitions(int **arr, size_t *n)
     else
     {
         *arr = temp;
-        *n = newLength;
+        *n = arrLen;
     }
 }
 
