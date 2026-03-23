@@ -1,4 +1,4 @@
-п»їUnit Unit1;
+Unit Unit1;
 
 Interface
 
@@ -36,19 +36,19 @@ Type
         LeaveTab: TMenuItem;
         InstructionTab: TMenuItem;
         AboutDeveloperTab: TMenuItem;
-    ButtonResult: TButton;
-    EditSepLength: TEdit;
-    LabelLength: TLabel;
+        ButtonResult: TButton;
+        EditSepLength: TEdit;
+        LabelLength: TLabel;
         TaskLabel: TLabel;
         OpenTextFileDialog1: TOpenTextFileDialog;
         SaveTextFileDialog1: TSaveTextFileDialog;
-    SGSeparators: TStringGrid;
-    LabelChangedStrings: TLabel;
-    LabelStrings: TLabel;
-    SGStrings: TStringGrid;
-    SGChangedStrings: TStringGrid;
-    LabelLengthString: TLabel;
-    EditLengthString: TEdit;
+        SGSeparators: TStringGrid;
+        LabelChangedStrings: TLabel;
+        LabelStrings: TLabel;
+        SGStrings: TStringGrid;
+        SGChangedStrings: TStringGrid;
+        LabelLengthStrings: TLabel;
+        EditLengthStrings: TEdit;
         Procedure EditSepLengthKeyPress(Sender: TObject; Var Key: Char);
         Procedure InstructionTabClick(Sender: TObject);
         Procedure AboutDeveloperTabClick(Sender: TObject);
@@ -63,8 +63,13 @@ Type
         Procedure SGSeparatorsExit(Sender: TObject);
         Procedure SGSeparatorsKeyDown(Sender: TObject; Var Key: Word; Shift: TShiftState);
         Function FormHelp(Command: Word; Data: THelpEventData; Var CallHelp: Boolean): Boolean;
-    procedure EditStringKeyPress(Sender: TObject; var Key: Char);
-    procedure EditStringChange(Sender: TObject);
+        Procedure EditStringKeyPress(Sender: TObject; var Key: Char);
+        Procedure EditLengthStringsChange(Sender: TObject);
+    procedure EditLengthStringsKeyPress(Sender: TObject; var Key: Char);
+    procedure SGStringsExit(Sender: TObject);
+    procedure SGStringsKeyPress(Sender: TObject; var Key: Char);
+    procedure SGStringsSelectCell(Sender: TObject; ACol, ARow: LongInt;
+      var CanSelect: Boolean);
 
     Private
         { Private declarations }
@@ -82,33 +87,181 @@ Function SaveDataToFile(): ERROR_CODES;
 Function LeaveFromProgram(CanClose: Boolean): Boolean;
 Function WriteDataToFile(Var SavedFile: TextFile): ERROR_CODES;
 Function ReadAndWriteOutFileData(Var ReadedFile: TextFile): ERROR_CODES;
+
 Function CheckLengthStringOnValidity(TestString: String): Boolean;
-Procedure SetStringGridACorrect();
-Procedure PrepareGrid(StringGrid: TStringGrid);
-Function CheckGridOnValidity(StringGrid: TStringGrid): Boolean;
-Function GetStringArrayFromGrid(StringGrid: TStringGrid): TArrayOS;
+Procedure SetSGSeparatorsCorrect();
+Procedure PrepareSGSep(StringGrid: TStringGrid);
+Function CheckSGSepOnValidity(SGArray: TArrayOS): Boolean;
+//Function CheckSGStringsOnValidity(StringGrid: TStringGrid): Boolean;
+Function GetStringArrayFromHorGrid(StringGrid: TStringGrid): TArrayOS;
+Function GetStringArrayFromVertGrid(StringGrid: TStringGrid): TArrayOS;
 Function ChangeStringArrayToIntArray(StringArray: TArrayOS): TArrayOI;
-Procedure OnSGChange;
+Procedure OnSGSepChange;
 Procedure FixEditLength;
-Procedure FixStringGridOnIncorrecValue;
+Procedure FixSGSepOnIncorrecValue;
+Procedure SetSGStringsCorrect(SG: TStringGrid);
+Procedure OnSGStringsChange();
+Function CheckSGStringsOnValidity(SGArray: TArrayOS): Boolean;
+Function FillVertGridByArrayData(FromArray: TArrayOS; ToGrid: TStringGrid): ERROR_CODES;
 
 Const
     MAX_ARRAY_LENGTH: Integer = 99;
     MIN_ARRAY_LENGTH: Integer = 1;
-    ERROR_TEXT: Array [ERROR_CODES] Of String = ('', 'РЎС‚СЂРѕРєР° С„Р°Р№Р»Р° РёРјРµРµС‚ РЅРµРєРѕСЂСЂРµРєС‚РЅС‹Р№ РІРІРѕРґ С‡РёСЃР»Р°.', 'Р¤Р°Р№Р» РЅРµ РЅР°Р№РґРµРЅ.',
-        'Р¤Р°Р№Р» РЅРµ СЃРѕРѕС‚РІРµС‚СЃС‚РІСѓРµС‚ С„РѕСЂРјР°С‚Сѓ .txt', 'Р¤Р°Р№Р» Р·Р°РєСЂС‹С‚ РґР»СЏ С‡С‚РµРЅРёСЏ.', 'Р¤Р°Р№Р» Р·Р°РєСЂС‹С‚ РґР»СЏ Р·Р°РїРёСЃРё Р»РёР±Рѕ РІРѕ РІСЂРµРјСЏ Р·Р°РїРёСЃРё РІРѕР·РЅРёРєР»Рё РїСЂРѕР±Р»РµРјС‹.',
-        'Р¤Р°Р№Р» РїСѓСЃС‚РѕР№.', 'Р¤Р°Р№Р» РёРјРµРµС‚ РЅРµРєРѕСЂРµРєС‚РЅС‹Р№ С„РѕСЂРјР°С‚ РґР°РЅРЅС‹С….', 'РћС€РёР±РєР° РїСЂРёСЃРѕРµРґРёРЅРµРЅРёСЏ С„Р°Р№Р»Р°.',
-        'РќРµ СѓРґР°Р»РѕСЃСЊ СѓСЃРїРµС€РЅРѕ СЃРѕС…СЂР°РЅРёС‚СЊ РґР°РЅРЅС‹Рµ РІ С„Р°Р№Р».');
+    ERROR_TEXT: Array [ERROR_CODES] Of String = ('', 'Строка файла имеет некорректный ввод числа.', 'Файл не найден.',
+        'Файл не соответствует формату .txt', 'Файл закрыт для чтения.', 'Файл закрыт для записи либо во время записи возникли проблемы.',
+        'Файл пустой.', 'Файл имеет некоректный формат данных.', 'Ошибка присоединения файла.',
+        'Не удалось успешно сохранить данные в файл.');
 
 Var
     MainForm: TMainForm;
     IsDataSaved: Boolean = True;
-    StrGridACol: LongInt = 0;
-    StrGridARow: LongInt = 1;
+    SGSepCol:     LongInt = 0;
+    SGSepRow:     LongInt = 1;
+    SGStringsCol: LongInt = 1;
+    SGSTringsRow: LongInt = 0;
 
 Implementation
 
 {$R *.dfm}
+
+Function CheckIsStringValidToFindSum(GivenString: String): Boolean;
+Var
+    I: Integer;
+    IsValid: Boolean;
+Begin
+    I := 1;
+    IsValid := True;
+
+    If Not(((GivenString[1] >= '0') And (GivenString[1] <= '9')) And (((GivenString[Length(GivenString)] > '0') Or (GivenString[Length(GivenString)] = '0')) And
+        ((GivenString[Length(GivenString)] < '9') Or (GivenString[Length(GivenString)] = '9')))) Then
+        IsValid := False;
+
+    If IsValid Then
+    Begin
+        For I := 1 To Length(GivenString) Do
+        Begin
+
+            If (I + 1 < Length(GivenString)) And ((GivenString[I] = '+') And (GivenString[I + 1] = '+')) Then
+                IsValid := False;
+
+            If Not(GivenString[I] In ['0' .. '9', ',', '+']) Then
+                IsValid := False;
+
+        End;
+    End;
+
+    CheckIsStringValidToFindSum := IsValid;
+End;
+
+Function FindSumFromString(GivenString: String): String;
+Var
+    SumOfNumbers, Number: Double;
+    I, PartLength, PartIndex: Integer;
+    StringPart, AnswerString: String;
+    IsFine, IsThereNumbers, IsNumberFull: Boolean;
+Begin
+    SumOfNumbers := 0.0;
+    Number := 0.0;
+    I := 0;
+    PartLength := 0;
+    PartIndex := 1;
+    StringPart := '';
+    IsFine := True;
+    IsThereNumbers := False;
+    IsNumberFull := False;
+
+    IsFine := CheckIsStringValidToFindSum(GivenString);
+
+    If IsFine Then
+    Begin
+        For I := 1 To Length(GivenString) Do
+        Begin
+
+            If (GivenString[I] = '+') Or (I = Length(GivenString)) Then
+            Begin
+                PartLength := I - PartIndex;
+
+                If I = Length(GivenString) Then
+                    PartLength := I - PartIndex + 1;
+
+                StringPart := Copy(GivenString, PartIndex, PartLength);
+                PartIndex := I + 1;
+                IsNumberFull := True;
+            End;
+
+            If IsNumberFull Then
+            Begin
+                Try
+                    Number := StrToFloat(StringPart);
+                    IsThereNumbers := True;
+                Except
+                    //WriteLn('Error with StrToFloat transformation.');
+                    IsFine := False;
+                End;
+            End;
+
+            IsNumberFull := False;
+
+            SumOfNumbers := SumOfNumbers + Number;
+            Number := 0;
+            StringPart := '';
+        End;
+    End;
+
+    If Not IsFine Then
+        AnswerString := 'Некорректная срока.'
+    Else
+        AnswerString := GivenString + '=' + FloatToStr(SumOfNumbers);
+
+    If Not IsThereNumbers Then
+        AnswerString := 'Строка не содержит чисел.';
+
+    FindSumFromString := AnswerString;
+End;
+
+Function FindAnswerString(ArrayOfSeparators: TArrayOS; GivenString: String): String;
+Var
+    Separator, Substring, AnswerString: String;
+    I, J, K, SpecialLength, LengthOfSeparator: Integer;
+Begin
+    Separator := '';
+    Substring := '';
+    AnswerString := '';
+    I := 0;
+    J := 0;
+    K := 0;
+    SpecialLength := 0;
+    LengthOfSeparator := 0;
+
+    For I := 0 To High(ArrayOfSeparators) Do
+    Begin
+
+        Separator := ArrayOfSeparators[I];
+        LengthOfSeparator := Length(Separator);
+        SpecialLength := Length(GivenString) - LengthOfSeparator + 1;
+        J := 1;
+
+        While (J < SpecialLength) Or (J = SpecialLength) Do
+        Begin
+
+            Substring := Copy(GivenString, J, LengthOfSeparator);
+
+            If Substring = Separator Then
+            Begin
+                Delete(GivenString, J, LengthOfSeparator - 1);
+                GivenString[J] := '+';
+            End;
+
+            SpecialLength := Length(GivenString) - LengthOfSeparator + 1;
+            Inc(J);
+        End;
+
+    End;
+
+    AnswerString := FindSumFromString(GivenString);
+
+    FindAnswerString := AnswerString;
+End;
 
 Function IsFileText(FilePath: String): Boolean;
 
@@ -242,7 +395,31 @@ Begin
 
 End;
 
-Procedure FixStringGridOnIncorrecValue();
+Procedure FixSGSepOnIncorrecValue();
+Const
+    DIGITS = ['0' .. '9'];
+    SG_ALLOWED_KEYS_NO_POINT = ['a'..'z', 'A'..'Z', '+', '-', '=', '*', '/', ':', ';', '(', ')'];
+Var
+    OnlyAllowed, CellString: String;
+    I, SelStart: Integer;
+Begin
+    OnlyAllowed := '';
+
+    CellString := MainForm.SGSeparators.Cells[SGSepCol, SGSepRow];
+
+    For I := 1 To High(CellString) Do
+    Begin
+        If (CellString[I] In SG_ALLOWED_KEYS_NO_POINT) Then
+            OnlyAllowed := OnlyAllowed + CellString[I];
+    End;
+
+    If OnlyAllowed <> CellString Then
+    Begin
+        MainForm.SGSeparators.Cells[SGSepCol, SGSepRow] := Copy(OnlyAllowed, 1, 5);
+    End;
+End;
+
+Procedure FixSGStringsOnIncorrecValue();
 Const
     DIGITS = ['0' .. '9'];
     SG_ALLOWED_KEYS = ['a'..'z', 'A'..'Z', '+', '-', '=', '*', '/', ':', ';', '(', ')', '.', ','];
@@ -252,40 +429,41 @@ Var
 Begin
     OnlyAllowed := '';
 
-    CellString := MainForm.SGSeparators.Cells[StrGridACol, StrGridARow];
+    CellString := MainForm.SGStrings.Cells[SGStringsCol, SGStringsRow];
 
     For I := 1 To High(CellString) Do
     Begin
-        If (CellString[I] In SG_ALLOWED_KEYS) Then
+        If (CellString[I] In SG_ALLOWED_KEYS) Or (CellString[I] In DIGITS) Then
             OnlyAllowed := OnlyAllowed + CellString[I];
     End;
 
     If OnlyAllowed <> CellString Then
     Begin
-        MainForm.SGSeparators.Cells[StrGridACol, StrGridARow] := Copy(OnlyAllowed, 1, 5);
+        MainForm.SGStrings.Cells[SGStringsCol, SGStringsRow] := Copy(OnlyAllowed, 1, 20);
     End;
 End;
 
-Function CheckGridOnValidity(StringGrid: TStringGrid): Boolean;
+Function CheckSGSepOnValidity(SGArray: TArrayOS): Boolean;
 Const
-    SG_ALLOWED_KEYS = ['a'..'z', 'A'..'Z', '+', '-', '=', '*', '/', ':', ';', '(', ')', '.', ','];
+    SG_ALLOWED_KEYS_NO_POINT = ['a'..'z', 'A'..'Z', '+', '-', '=', '*', '/', ':', ';', '(', ')'];
 Var
     I, Index: Integer;
     TestString: String;
-    SGArray: TArrayOS;
+    //SGArray: TArrayOS;
     IsAllGridCorrect, IsCellReadible: Boolean;
 Begin
     TestString := #0;
     IsAllGridCorrect := True;
     IsCellReadible := True;
 
-    SGArray := Nil;
+    //SGArray := Nil;
 
-    If (Length(MainForm.EditSepLength.Text) = 0) Or (MainForm.EditSepLength.Text = #0) Or (MainForm.EditSepLength.Text = '') Then
+    //If (Length(MainForm.EditSepLength.Text) = 0) Or (MainForm.EditSepLength.Text = #0) Or (MainForm.EditSepLength.Text = '') Then
+    If (Length(SGArray) = 0) Or (SGArray = nil) Then
         IsAllGridCorrect := False
     Else
     Begin
-        SGArray := GetStringArrayFromGrid(StringGrid);
+        //SGArray := GetStringArrayFromHorGrid(StringGrid);
 
         For Index := 0 To High(SGArray) Do
         Begin
@@ -297,7 +475,7 @@ Begin
             Begin
                 IsCellReadible := True;
                 For I := 1 To High(TestString) Do
-                    If Not(TestString[I] In SG_ALLOWED_KEYS) Then
+                    If Not(TestString[I] In SG_ALLOWED_KEYS_NO_POINT) Then
                         IsCellReadible := False;
             End;
 
@@ -305,19 +483,58 @@ Begin
         End;
     End;
 
-    CheckGridOnValidity := IsAllGridCorrect;
+    CheckSGSepOnValidity := IsAllGridCorrect;
 End;
 
-Function GetStringArrayFromGrid(StringGrid: TStringGrid): TArrayOS;
+//Function CheckSGStringsOnValidity(StringGrid: TStringGrid): Boolean;
+//Const
+//    SG_ALLOWED_KEYS = ['a'..'z', 'A'..'Z', '+', '-', '=', '*', '/', ':', ';', '(', ')', '.', ','];
+//Var
+//    I, Index: Integer;
+//    TestString: String;
+//    SGArray: TArrayOS;
+//    IsAllGridCorrect, IsCellReadible: Boolean;
+//Begin
+//    TestString := #0;
+//    IsAllGridCorrect := True;
+//    IsCellReadible := True;
+//
+//    SGArray := Nil;
+//
+//    If (Length(MainForm.EditSepLength.Text) = 0) Or (MainForm.EditSepLength.Text = #0) Or (MainForm.EditSepLength.Text = '') Then
+//        IsAllGridCorrect := False
+//    Else
+//    Begin
+//        SGArray := GetStringArrayFromHorGrid(StringGrid);
+//
+//        For Index := 0 To High(SGArray) Do
+//        Begin
+//            TestString := SGArray[Index];
+//
+//            If (Length(TestString) = 0) Or (Length(TestString) > 20) Or (TestString = #0) Or (TestString = '') Then
+//                IsCellReadible := False
+//            Else
+//            Begin
+//                IsCellReadible := True;
+//                For I := 1 To High(TestString) Do
+//                    If Not(TestString[I] In SG_ALLOWED_KEYS) Then
+//                        IsCellReadible := False;
+//            End;
+//
+//            IsAllGridCorrect := IsAllGridCorrect And IsCellReadible;
+//        End;
+//    End;
+//
+//    CheckSGStringsOnValidity := IsAllGridCorrect;
+//End;
+//
+Function GetStringArrayFromHorGrid(StringGrid: TStringGrid): TArrayOS;
 Var
     StringArray: TArrayOS;
     I, ArrLength, ArrHigh: Integer;
     NumberOneText: String;
 Begin
-    NumberOneText := '';
-    NumberOneText := MainForm.EditSepLength.Text;
-
-    ArrLength := StrToInt(NumberOneText);
+    ArrLength := StringGrid.ColCount;
     ArrHigh := ArrLength - 1;
 
     SetLength(StringArray, ArrLength);
@@ -327,7 +544,26 @@ Begin
         StringArray[I] := StringGrid.Cells[I, 1];
     End;
 
-    GetStringArrayFromGrid := StringArray;
+    GetStringArrayFromHorGrid := StringArray;
+End;
+
+Function GetStringArrayFromVertGrid(StringGrid: TStringGrid): TArrayOS;
+Var
+    StringArray: TArrayOS;
+    I, ArrLength, ArrHigh: Integer;
+    NumberOneText: String;
+Begin
+    ArrLength := StringGrid.RowCount;
+    ArrHigh := ArrLength - 1;
+
+    SetLength(StringArray, ArrLength);
+
+    For I := 0 To ArrHigh Do
+    Begin
+        StringArray[I] := StringGrid.Cells[1, I];
+    End;
+
+    GetStringArrayFromVertGrid := StringArray;
 End;
 
 Function ChangeStringArrayToIntArray(StringArray: TArrayOS): TArrayOI;
@@ -379,6 +615,7 @@ Begin
     IsFirstAndLastCharCorrect := False;
     IsNumsInBounds := True;
     IsAllCharsCorrect := True;
+    IsAllGood := True;
 
     If Length(WrittenString) = 0 then
         IsAllGood := False
@@ -397,7 +634,7 @@ Begin
                                 And (WrittenString[I-1] In Digits)
                                 And (WrittenString[I-2] In Digits)
                                 And (WrittenString[I-3] In Digits)
-                                And (WrittenString[I-3] In Digits);
+                                And (WrittenString[I-4] In Digits);
                 If IsFiveDigitsInARow Then
                     IsNumsInBounds := False;
             End;
@@ -409,16 +646,49 @@ Begin
     CheckStringOnValidity := IsAllGood;
 End;
 
-Procedure PrepareGrid(StringGrid: TStringGrid);
+Function CheckSGStringsOnValidity(SGArray: TArrayOS): Boolean;
+Var
+    I: Integer;
+    IsAllGood, IsStringGood: Boolean;
+Begin
+    IsAllGood := True;
+
+    If (Length(SGArray) <> 0) Then
+        For I := 0 To High(SGArray) Do
+        Begin
+            IsStringGood := CheckStringOnValidity(SGArray[I]);
+
+            IsAllGood := IsAllGood And IsStringGood;
+        End;
+
+    CheckSGStringsOnValidity := IsAllGood;
+End;
+
+Procedure PrepareSGSep(StringGrid: TStringGrid);
 Var
     I: Integer;
 Begin
-    //РќСѓРјРµСЂСѓРµС‚ РїРµСЂРІСѓСЋ СЃС‚СЂРѕРєСѓ Рё РѕР±РЅСѓР»СЏРµС‚ Р·РЅР°С‡РµРЅРёСЏ, РѕС‚РєР»СЋС‡Р°РµС‚ РєРЅРѕРїРєСѓ "Р РµР·СѓР»СЊС‚Р°С‚".
+    //Нумерует первую строку и обнуляет значения, отключает кнопку "Результат".
     MainForm.ButtonResult.Enabled := False;
     For I := 0 To StringGrid.ColCount Do
     Begin
-        StringGrid.Cells[I, 0] := 'в„– ' + IntToStr(I + 1);
+        StringGrid.Cells[I, 0] := '№ ' + IntToStr(I + 1);
         StringGrid.Cells[I, 1] := '';
+    End;
+End;
+
+Procedure PrepareSGStrings(StringGrid: TStringGrid);
+Var
+    I: Integer;
+Begin
+    //Нумерует первый столбец и обнуляет значения, отключает кнопку "Результат".
+    MainForm.ButtonResult.Enabled := False;
+    StringGrid.ColWidths[0] := 50;
+    StringGrid.ColWidths[1] := 500;
+    For I := 0 To StringGrid.RowCount Do
+    Begin
+        StringGrid.Cells[0, I] := '№ ' + IntToStr(I + 1);
+        StringGrid.Cells[1, I] := '';
     End;
 End;
 
@@ -433,7 +703,7 @@ Begin
     IsKeyAllowed := False;
     WrittenString := EditSepLength.Text;
 
-    //РџСЂРѕРІРµСЂСЏРµРј РџР•Р Р’Р«Р™ СЃРёРјРІРѕР» Р±СѓРґСѓС‰РµР№ СЃС‚СЂРѕРєРё
+    //Проверяем ПЕРВЫЙ символ будущей строки
     If ((Length(WrittenString) = 0) And (Key In DIGITS) And Not(Key = '0')) Then
         IsKeyAllowed := True;
 
@@ -450,25 +720,6 @@ Begin
 
     If Not IsKeyAllowed Then
         Key := #0;
-End;
-
-Procedure TMainForm.EditStringChange(Sender: TObject);
-Var
-    IsStringCorrect: Boolean;
-    MyString: String;
-Begin
-    //MyString := MainForm.EditString.Text;
-    IsStringCorrect := CheckStringOnValidity(MyString);
-
-    If IsStringCorrect Then
-    Begin
-        ButtonResult.Enabled := True;
-    End
-    Else
-    Begin
-        ButtonResult.Enabled := False;
-    End;
-
 End;
 
 Procedure TMainForm.EditStringKeyPress(Sender: TObject; Var Key: Char);
@@ -518,7 +769,7 @@ End;
 
 Procedure TMainForm.SGSeparatorsKeyPress(Sender: TObject; Var Key: Char);
 Const
-    SG_ALLOWED_KEYS = ['a'..'z', 'A'..'Z', '+', '-', '=', '*', '/', ':', ';', '(', ')', '.', ','];
+    SG_ALLOWED_KEYS_NO_POINT = ['a'..'z', 'A'..'Z', '+', '-', '=', '*', '/', ':', ';', '(', ')'];
     BACKSPACE = #8;
 Var
     WrittenString: String;
@@ -527,7 +778,7 @@ Begin
     IsKeyAllowed := False;
     WrittenString := SGSeparators.Cells[SGSeparators.Col, SGSeparators.Row];
 
-    If ((Length(WrittenString) > (-1)) And (Length(WrittenString) < 5) And (Key In SG_ALLOWED_KEYS)) Then
+    If ((Length(WrittenString) > (-1)) And (Length(WrittenString) < 5) And (Key In SG_ALLOWED_KEYS_NO_POINT)) Then
         IsKeyAllowed := True;
 
     If Key = BACKSPACE Then
@@ -540,42 +791,142 @@ End;
 Procedure TMainForm.EditSepLengthChange(Sender: TObject);
 Var
     IsLengthCorrect, IsReady: Boolean;
+    ArrayOfSep: TArrayOS;
 Begin
     IsLengthCorrect := CheckLengthStringOnValidity(EditSepLength.Text);
-    IsReady := IsLengthCorrect And CheckGridOnValidity(SGSeparators);
+    ArrayOfSep := GetStringArrayFromHorGrid(SGSeparators);
+
+    IsReady := IsLengthCorrect And CheckSGSepOnValidity(ArrayOfSep);
 
     SaveTab.Enabled := False;
+    IsDataSaved := True;
+    ButtonResult.Enabled := False;
+
     LabelStrings.Visible := False;
     SGStrings.Visible := False;
-    IsDataSaved := True;
-    SaveTab.Enabled := False;
-    LabelchangedStrings.Visible := False;
 
-    SetStringGridACorrect;
+    LabelLengthStrings.Visible := False;
+    EditLengthStrings.Visible := False;
+    SGStrings.Visible := False;
+
+    LabelChangedStrings.Visible := False;
+    SGChangedStrings.Visible := False;
+
+    SetSGSeparatorsCorrect;
     FixEditLength()
 End;
 
-Procedure OnSGChange();
+Procedure TMainForm.EditLengthStringsChange(Sender: TObject);
 Var
-    ArrayStringGridA: TArrayOS;
+    IsReady: Boolean;
+Begin
+    IsReady := CheckLengthStringOnValidity(EditLengthStrings.Text);
+
+    SaveTab.Enabled := False;
+    IsDataSaved := True;
+    SaveTab.Enabled := False;
+    SGStrings.Visible := False;
+
+    LabelStrings.Visible := IsReady;
+    SGStrings.Visible := IsReady;
+
+    LabelchangedStrings.Visible := False;
+
+    SetSGStringsCorrect(SGStrings);
+    FixEditLength()
+End;
+
+Procedure TMainForm.EditLengthStringsKeyPress(Sender: TObject; Var Key: Char);
+Const
+    BACKSPACE = #8;
+    DIGITS = ['0' .. '9'];
+Var
+    WrittenString: String;
+    IsKeyAllowed: Boolean;
+Begin
+    IsKeyAllowed := False;
+    WrittenString := EditLengthStrings.Text;
+
+    //Проверяем ПЕРВЫЙ символ будущей строки
+    If ((Length(WrittenString) = 0) And (Key In DIGITS) And Not(Key = '0')) Then
+        IsKeyAllowed := True;
+
+    If (Length(WrittenString) > 0) And (Length(WrittenString) < 2) Then
+    Begin
+        If Key In DIGITS Then
+        Begin
+            IsKeyAllowed := True;
+        End;
+    End;
+
+    If Key = BACKSPACE Then
+        IsKeyAllowed := True;
+
+    If Not IsKeyAllowed Then
+        Key := #0;
+End;
+
+Procedure OnSGSepChange();
+Var
+    ArrayOfSep: TArrayOS;
     IsGridValid, IsLengthCorrect: Boolean;
 Begin
     IsGridValid := False;
     IsLengthCorrect := False;
-    ArrayStringGridA := Nil;
+    ArrayOfSep := Nil;
 
-    IsGridValid := CheckGridOnValidity(MainForm.SGSeparators);
+    ArrayOfSep := GetStringArrayFromHorGrid(MainForm.SGSeparators);
+
+    IsGridValid := CheckSGSepOnValidity(ArrayOfSep);
     IsLengthCorrect := CheckLengthStringOnValidity(MainForm.EditSepLength.Text);
-    FixStringGridOnIncorrecValue();
+    FixSGSepOnIncorrecValue();
 
-    MainForm.SGStrings.Visible := IsLengthCorrect And CheckGridOnValidity(MainForm.SGSeparators);
-    MainForm.LabelStrings.Visible := IsLengthCorrect And CheckGridOnValidity(MainForm.SGSeparators);
+    If IsGridValid then
+    Begin
+        MainForm.LabelLengthStrings.Visible := True;
+        MainForm.EditLengthStrings.Visible := True;
+    End
+    Else
+    Begin
+        MainForm.LabelLengthStrings.Visible := False;
+        MainForm.EditLengthStrings.Visible := False;
+        MainForm.LabelStrings.Visible := False;
+        MainForm.SGStrings.Visible := False;
+    End;
+
+    SetSGStringsCorrect(MainForm.SGStrings);
+    If MainForm.EditLengthStrings.Text <> '' Then
+        MainForm.EditLengthStrings.Clear;
+
+    MainForm.SaveTab.Enabled := False;
+    MainForm.LabelChangedStrings.Visible := False;
+    MainForm.SGChangedStrings.Visible := False;
+End;
+
+Procedure OnSGStringsChange();
+Var
+    ArraySG: TArrayOS;
+    IsGridValid, IsLengthCorrect: Boolean;
+Begin
+    IsGridValid := False;
+    IsLengthCorrect := False;
+    ArraySG := Nil;
+
+    ArraySG := GetStringArrayFromVertGrid(MainForm.SGStrings);
+
+    FixSGSepOnIncorrecValue();
+
+    IsGridValid := CheckSGStringsOnValidity(ArraySG);
+    IsLengthCorrect := CheckLengthStringOnValidity(MainForm.EditLengthStrings.Text);
+
+    MainForm.ButtonResult.Enabled := IsLengthCorrect And IsGridValid;
+    //MainForm.EditLengthStrings.Visible := IsLengthCorrect And CheckSGSepOnValidity(MainForm.SGSeparators);
 
     MainForm.SaveTab.Enabled := False;
     MainForm.LabelChangedStrings.Visible := False;
 End;
 
-Procedure SetStringGridACorrect();
+Procedure SetSGSeparatorsCorrect();
 Var
     IsLengthCorrect: Boolean;
 Begin
@@ -584,14 +935,28 @@ Begin
     If IsLengthCorrect Then
     Begin
         MainForm.SGSeparators.ColCount := StrToInt(MainForm.EditSepLength.Text);
-        PrepareGrid(MainForm.SGSeparators);
+        PrepareSGSep(MainForm.SGSeparators);
     End;
     MainForm.SGSeparators.Visible := IsLengthCorrect;
 End;
 
+Procedure SetSGStringsCorrect(SG: TStringGrid);
+Var
+    IsLengthCorrect: Boolean;
+Begin
+    IsLengthCorrect := CheckLengthStringOnValidity(MainForm.EditLengthStrings.Text);
+
+    If IsLengthCorrect Then
+    Begin
+        SG.RowCount := StrToInt(MainForm.EditLengthStrings.Text);
+        PrepareSGStrings(SG);
+    End;
+    //MainForm.SGStrings.Visible := IsLengthCorrect;
+End;
+
 Procedure TMainForm.SGSeparatorsExit(Sender: TObject);
 Begin
-    OnSGChange();
+    OnSGSepChange();
 End;
 
 Procedure TMainForm.OpenTabClick(Sender: TObject);
@@ -622,46 +987,68 @@ Begin
             IsDataSaved := True;
         End;
         If Error <> NO_ERRORS Then
-            Application.MessageBox(PWideChar(ERROR_TEXT[Error]), 'РћС€РёР±РєР°', MB_OK + MB_ICONERROR);
+            Application.MessageBox(PWideChar(ERROR_TEXT[Error]), 'Ошибка', MB_OK + MB_ICONERROR);
 
     End;
 End;
 
+Function GetChangedStrings(ArrayOfStrings, ArrayOfSep: TArrayOS): TArrayOS;
+Var
+    ArrayOfChangedStrings: TArrayOS;
+    I: Integer;
+Begin
+    ArrayOfChangedStrings := Nil;
+
+    SetLength(ArrayOfChangedStrings, Length(ArrayOfStrings));
+
+    For I := 0 To High(ArrayOfStrings) Do
+    Begin
+        ArrayOfChangedStrings[I] := FindAnswerString(ArrayOfSep, ArrayOfStrings[I]);
+    End;
+
+    GetChangedStrings := ArrayOfChangedStrings;
+End;
+
 Procedure TMainForm.ButtonResultClick(Sender: TObject);
 Var
-    StringArray: TArrayOS;
-    IntArray: TArrayOI;
+    ArrayOfSep, ArrayOfStrings, ArrayOfChangedStrings: TArrayOS;
     I, ArrLength, ArrHigh, AnswerNumber: Integer;
     NumberOneText: String;
     IsLengthCorrect: Boolean;
 Begin
     LabelChangedStrings.Visible := True;
     AnswerNumber := -1;
-    StringArray := Nil;
+    ArrayOfSep := Nil;
+    ArrayOfStrings := Nil;
+    ArrayOfChangedStrings := Nil;
     ArrLength := 0;
     ArrHigh := 0;
     NumberOneText := '';
+
     IsLengthCorrect := CheckLengthStringOnValidity(EditSepLength.Text);
 
     IsDataSaved := False;
 
     NumberOneText := MainForm.EditSepLength.Text;
+    ArrayOfSep := GetStringArrayFromHorGrid(SGSeparators);
+    ArrayOfStrings := GetStringArrayFromVertGrid(SGStrings);
 
     ArrLength := StrToInt(NumberOneText);
     ArrHigh := ArrLength - 1;
 
-    StringArray := GetStringArrayFromGrid(SGSeparators);
-    IntArray := ChangeStringArrayToIntArray(StringArray);
+    //IntArray := ChangeStringArrayToIntArray(StringArray);
 
-    MainForm.SaveTab.Enabled := IsLengthCorrect And CheckGridOnValidity(MainForm.SGSeparators);
+    MainForm.SaveTab.Enabled := IsLengthCorrect And CheckSGSepOnValidity(ArrayOfSep);
 
     // ===Calculate_Result===
-
+    ArrayOfChangedStrings := GetChangedStrings(ArrayOfStrings, ArrayOfSep);
     //
 
     // ===Show_Result===
+    FillVertGridByArrayData(ArrayOfChangedStrings, SGChangedStrings);
+    MainForm.SGChangedStrings.Visible := True;
     MainForm.LabelChangedStrings.Visible := True;
-    MainForm.LabelChangedStrings.Caption := 'РќРѕРјРµСЂ СЌР»РµРјРµРЅС‚Р°: ' + IntToStr(AnswerNumber);
+    MainForm.LabelChangedStrings.Caption := 'Строки после форматирования: ' + IntToStr(AnswerNumber);
     //
 End;
 
@@ -670,35 +1057,110 @@ Begin
     SaveDataToFile();
 End;
 
-Function FillGridByArrayData(FromArray: TArrayOI; ToGrid: TStringGrid): ERROR_CODES;
+Function FillHorGridByArrayData(FromArray: TArrayOS; ToGrid: TStringGrid): ERROR_CODES;
 Var
     Error: ERROR_CODES;
     I, GridLength, GridHigh: Integer;
 Begin
-    Error := NO_ERRORS; //Рђ РЅСѓР¶РЅРѕ Р»Рё?
+    Error := NO_ERRORS; //А нужно ли?
 
     GridLength := 0;
 
     GridHigh := High(FromArray);
 
-    ToGrid.ColCount := StrToInt(MainForm.EditSepLength.Text);
-    PrepareGrid(ToGrid);
+    ToGrid.ColCount := Length(FromArray);
+    PrepareSGSep(ToGrid);
 
     For I := 0 To GridHigh Do
     Begin
-        ToGrid.Cells[I, 1] := IntToStr(FromArray[I]);
+        ToGrid.Cells[I, 1] := FromArray[I];
     End;
 
-    FillGridByArrayData := Error;
+    FillHorGridByArrayData := Error;
 End;
+
+Function FillVertGridByArrayData(FromArray: TArrayOS; ToGrid: TStringGrid): ERROR_CODES;
+Var
+    Error: ERROR_CODES;
+    I, GridLength, GridHigh: Integer;
+Begin
+    Error := NO_ERRORS; //А нужно ли?
+
+    GridLength := 0;
+
+    GridHigh := High(FromArray);
+
+    ToGrid.RowCount := Length(FromArray);
+    PrepareSGStrings(ToGrid);
+
+    For I := 0 To GridHigh Do
+    Begin
+        ToGrid.Cells[1, I] := FromArray[I];
+    End;
+
+    FillVertGridByArrayData := Error;
+End;
+
 
 Procedure TMainForm.SGSeparatorsSelectCell(Sender: TObject; ACol, ARow: LongInt; Var CanSelect: Boolean);
 Begin
-    FixStringGridOnIncorrecValue();
-    StrGridACol := ACol;
-    StrGridARow := ARow;
-    OnSGChange();
-    FixStringGridOnIncorrecValue();
+    FixSGSepOnIncorrecValue();
+    SGSepCol := ACol;
+    SGSepRow := ARow;
+    OnSGSepChange();
+    FixSGSepOnIncorrecValue();
+End;
+
+procedure TMainForm.SGStringsExit(Sender: TObject);
+begin
+    OnSGStringsChange();
+end;
+
+Procedure TMainForm.SGStringsKeyPress(Sender: TObject; Var Key: Char);
+Const
+    SG_ALLOWED_KEYS = ['a'..'z', 'A'..'Z', '+', '-', '=', '*', '/', ':', ';', '(', ')', '.', ','];
+    DIGITS = ['0'..'9'];
+    BACKSPACE = #8;
+Var
+    WrittenString: String;
+    IsKeyAllowed, IsLastFourKeysWasDigits: Boolean;
+Begin
+    IsKeyAllowed := False;
+    IsLastFourKeysWasDigits := False;
+
+    WrittenString := SGStrings.Cells[SGStringsCol, SGStringsRow];
+
+    If ((Length(WrittenString) = 0) And (Key In DIGITS) And (Key <> '0')) Then
+        IsKeyAllowed := True;
+
+    If ((Length(WrittenString) > 0) And (Length(WrittenString) < 20) And ((Key In SG_ALLOWED_KEYS) Or (Key In Digits))) Then
+        IsKeyAllowed := True;
+
+    If (Length(WrittenString) > 3) Then
+    Begin
+        IsLastFourKeysWasDigits := (WrittenString[High(WrittenString)] In Digits)
+                               And (WrittenString[High(WrittenString)-1] In Digits)
+                               And (WrittenString[High(WrittenString)-2] In Digits)
+                               And (WrittenString[High(WrittenString)-3] In Digits);
+        If (IsLastFourKeysWasDigits) And (Key In DIGITS) Then
+            IsKeyAllowed := False;
+    End;
+
+    If Key = BACKSPACE Then
+        IsKeyAllowed := True;
+
+    If Not IsKeyAllowed Then
+        Key := #0;
+End;
+
+procedure TMainForm.SGStringsSelectCell(Sender: TObject; ACol, ARow: LongInt;
+  var CanSelect: Boolean);
+Begin
+    FixSGStringsOnIncorrecValue();
+    SGStringsCol := ACol;
+    SGStringsRow := ARow;
+    OnSGStringsChange();
+    FixSGStringsOnIncorrecValue();
 End;
 
 Procedure TMainForm.AboutDeveloperTabClick(Sender: TObject);
@@ -706,9 +1168,9 @@ Var
     AboutDeveloperForm: TGuideForm;
 Begin
     AboutDeveloperForm := TGuideForm.Create(Self);
-    AboutDeveloperForm.GuideLabel.Caption := 'Р Р°Р·СЂР°Р±РѕС‚С‡РёРє: РџРµРґСЊРєРѕ Р’Р»Р°РґРёСЃР»Р°РІ Р®СЂСЊРµРІРёС‡'#13#10'Р“СЂСѓРїРїР°: 551004'#13#10'Telegram: @ginguare';
+    AboutDeveloperForm.GuideLabel.Caption := 'Разработчик: Педько Владислав Юрьевич'#13#10'Группа: 551004'#13#10'Telegram: @ginguare';
     AboutDeveloperForm.GuideLabel.Font.Size := 11;
-    AboutDeveloperForm.Caption := 'Рћ Р Р°Р·СЂР°Р±РѕС‚С‡РёРєРµ';
+    AboutDeveloperForm.Caption := 'О Разработчике';
     AboutDeveloperForm.ShowModal;
     AboutDeveloperForm.Free;
 End;
@@ -719,13 +1181,13 @@ Var
 Begin
     InstructionForm := TGuideForm.Create(Self);
     InstructionForm.GuideLabel.Caption :=
-        '1) Р—Р° РґР»РёРЅСѓ РјР°СЃСЃРёРІР° РїСЂРёРЅРёРјР°РµС‚СЃСЏ С†РµР»РѕРµ С‡РёСЃР»Рѕ РѕС‚ 1 РґРѕ 99.'#13#10 +
-        '2) РЎС‚СЂРѕРєР° РїСЂРµРґСЃС‚Р°РІР»СЏРµС‚ СЃРѕР±РѕР№ РїРѕСЃР»РµРґРѕРІР°С‚РµР»СЊРЅСѓСЋ Р·Р°РїРёСЃСЊ С†РµР»С‹С… С‡РёСЃРµР» [1..9999] Рё СЂР°Р·РґРµР»РёС‚РµР»РµР№ РёР· СѓР¶Рµ СѓРєР°Р·Р°РЅРЅС‹С… РІС‹С€Рµ.'#13#10 +
-        '3) РЎС‚СЂРѕРєР° РґРѕР»Р¶РЅР° РЅР°С‡РёРЅР°С‚СЊСЃСЏ Рё Р·Р°РєР°РЅС‡РёРІР°С‚СЊСЃСЏ С‡РёСЃР»РѕРј '#13#10 +
-        '4) Р”Р»СЏ РІРѕР·РјРѕР¶РЅРѕСЃС‚Рё РІС‹РІРѕРґР° СЂРµР·СѓР»СЊС‚Р°С‚РѕРІ РЅСѓР¶РЅРѕ Р·Р°РїРѕР»РЅРёС‚СЊ РєРѕСЂСЂРµРєС‚РЅС‹РјРё Р·РЅР°С‡РµРЅРёСЏРјРё РІСЃРµ СЏС‡РµР№РєРё РјР°СЃСЃРёРІР° Рё СѓР±СЂР°С‚СЊ С„РѕРєСѓСЃ РјС‹С€Рё СЃ РЅРµРіРѕ.'#13#10;
+        '1) За длину массива принимается целое число от 1 до 99.'#13#10 +
+        '2) Строка представляет собой последовательную запись чисел [1..9999.9999] и разделителей из уже указанных выше.'#13#10 +
+        '3) Строка должна начинаться и заканчиваться числом '#13#10 +
+        '4) Для возможности вывода результатов нужно заполнить корректными значениями все ячейки массива и убрать фокус мыши с него.'#13#10;
 
     InstructionForm.GuideLabel.Font.Size := 9;
-    InstructionForm.Caption := 'РРЅСЃС‚СЂСѓРєС†РёСЏ';
+    InstructionForm.Caption := 'Инструкция';
     InstructionForm.GuideLabel.WordWrap := True;
     InstructionForm.ShowModal;
     InstructionForm.Free;
@@ -758,10 +1220,10 @@ Begin
         End;
 
         If Error <> NO_ERRORS Then
-            Application.MessageBox(PWideChar(ERROR_TEXT[Error]), 'РћС€РёР±РєР°', MB_OK + MB_ICONERROR)
+            Application.MessageBox(PWideChar(ERROR_TEXT[Error]), 'Ошибка', MB_OK + MB_ICONERROR)
         Else
         Begin
-            Application.MessageBox(PWideChar('Р”Р°РЅРЅС‹Рµ СѓСЃРїРµС€РЅРѕ СЃРѕС…СЂР°РЅРµРЅС‹.'), 'РЈСЃРїРµС€РЅРѕ', MB_OK + MB_ICONINFORMATION);
+            Application.MessageBox(PWideChar('Данные успешно сохранены.'), 'Успешно', MB_OK + MB_ICONINFORMATION);
             IsDataSaved := True;
         End;
 
@@ -787,7 +1249,7 @@ Begin
 
     ArrLength := StrToInt(MainForm.EditSepLength.Text);
     ArrHigh := ArrLength - 1;
-    StringGridAArray := GetStringArrayFromGrid(MainForm.SGSeparators);
+    StringGridAArray := GetStringArrayFromHorGrid(MainForm.SGSeparators);
     StringGridResultArray := Copy(StringGridAArray);
 
     For I := 0 To ArrHigh Do
@@ -806,7 +1268,7 @@ Begin
         Write(SavedFile, StringGridAArray[High(StringGridAArray)]);
         WriteLn(SavedFile);
 
-        Write(SavedFile, StringReplace(MainForm.LabelChangedStrings.Caption, 'РќРѕРјРµСЂ СЌР»РµРјРµРЅС‚Р°: ', '', [RfReplaceAll]));
+        Write(SavedFile, StringReplace(MainForm.LabelChangedStrings.Caption, 'Номер элемента: ', '', [RfReplaceAll]));
 
         CloseFile(SavedFile);
     Except
@@ -826,7 +1288,7 @@ Var
     Error: ERROR_CODES;
     ArrLength, ArrHigh, I, AnswerNumber: Integer;
     ArrLengthStr, FinalString: String;
-    GridAArray: TArrayOI;
+    GridAArray: TArrayOS;
 Begin
     ArrLength := 0;
     ArrHigh := 0;
@@ -884,8 +1346,8 @@ Begin
 
                 Try
                     Read(ReadedFile, GridAArray[I]);
-                    If (GridAArray[I] > MAX_ELEMENT) Or (GridAArray[I] < MIN_ELEMENT) Then
-                        Error := FILE_DATA_NOT_CORRECT;
+//                    If (GridAArray[I] > MAX_ELEMENT) Or (GridAArray[I] < MIN_ELEMENT) Then
+//                        Error := FILE_DATA_NOT_CORRECT;
                 Except
                     GridAArray := Nil;
                     Error := FILE_DATA_NOT_CORRECT;
@@ -915,8 +1377,8 @@ Begin
         //
 
         // ===Show_Result===
-        FillGridByArrayData(GridAArray, MainForm.SGSeparators);
-        MainForm.LabelChangedStrings.Caption := 'РќРѕРјРµСЂ СЌР»РµРјРµРЅС‚Р°: ' + IntToStr(AnswerNumber);
+        FillHorGridByArrayData(GridAArray, MainForm.SGSeparators);
+        MainForm.LabelChangedStrings.Caption := 'Номер элемента: ' + IntToStr(AnswerNumber);
         //
     End;
 
@@ -947,9 +1409,9 @@ Begin
     Error := NO_ERRORS;
     CanClose := False;
 
-    If (IsDataSaved) Or Not(CheckGridOnValidity(MainForm.SGSeparators)) Then
+    If (IsDataSaved) Then
     Begin
-        IsFormShouldClose := Application.MessageBox(PChar('Р’С‹ С…РѕС‚РёС‚Рµ РІС‹Р№С‚Рё?'), PChar('Р’С‹С…РѕРґ'), MB_YESNO + MB_ICONQUESTION);
+        IsFormShouldClose := Application.MessageBox(PChar('Вы хотите выйти?'), PChar('Выход'), MB_YESNO + MB_ICONQUESTION);
 
         If IsFormShouldClose = MrYes Then
         Begin
@@ -958,7 +1420,7 @@ Begin
     End
     Else
     Begin
-        IsFormShouldClose := Application.MessageBox(PChar('Р”Р°РЅРЅС‹Рµ РЅРµ Р±С‹Р»Рё СЃРѕС…СЂР°РЅРµРЅС‹, РІС‹ С‚РѕС‡РЅРѕ С…РѕС‚РёС‚Рµ РІС‹Р№С‚Рё?'), PChar('Р’С‹С…РѕРґ'),
+        IsFormShouldClose := Application.MessageBox(PChar('Данные не были сохранены, вы точно хотите выйти?'), PChar('Выход'),
             MB_YESNOCANCEL + MB_ICONQUESTION);
 
         If IsFormShouldClose = MrYes Then
