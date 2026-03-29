@@ -120,7 +120,7 @@ object MainForm: TMainForm
     Top = 179
     Width = 62
     Height = 33
-    Hint = #1044#1083#1080#1085#1085#1072
+    Hint = #1044#1083#1080#1085#1072
     Margins.Left = 5
     Margins.Top = 5
     Margins.Right = 5
@@ -268,7 +268,7 @@ object MainForm: TMainForm
     Top = 351
     Width = 62
     Height = 33
-    Hint = #1044#1083#1080#1085#1085#1072
+    Hint = #1044#1083#1080#1085#1072
     Margins.Left = 5
     Margins.Top = 5
     Margins.Right = 5

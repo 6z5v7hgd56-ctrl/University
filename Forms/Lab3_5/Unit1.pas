@@ -209,7 +209,7 @@ Begin
     End;
 
     If Not IsFine Then
-        AnswerString := 'Некорректная срока.'
+        AnswerString := 'Некорректная строка.'
     Else
         If Not IsThereNumbers Then
             AnswerString := 'Строка не содержит чисел.'
@@ -924,6 +924,8 @@ Begin
 
     MainForm.SaveTab.Enabled := False;
     MainForm.LabelChangedStrings.Visible := False;
+    IsDataSaved := True;
+    MainForm.SGChangedStrings.Visible := False;
 End;
 
 Procedure SetSGSeparatorsCorrect();
@@ -1012,12 +1014,11 @@ End;
 Procedure TMainForm.ButtonResultClick(Sender: TObject);
 Var
     ArrayOfSep, ArrayOfStrings, ArrayOfChangedStrings: TArrayOS;
-    I, ArrLength, ArrHigh, AnswerNumber: Integer;
+    I, ArrLength, ArrHigh: Integer;
     NumberOneText: String;
     IsLengthCorrect: Boolean;
 Begin
     LabelChangedStrings.Visible := True;
-    AnswerNumber := -1;
     ArrayOfSep := Nil;
     ArrayOfStrings := Nil;
     ArrayOfChangedStrings := Nil;
@@ -1036,8 +1037,6 @@ Begin
     ArrLength := StrToInt(NumberOneText);
     ArrHigh := ArrLength - 1;
 
-    //IntArray := ChangeStringArrayToIntArray(StringArray);
-
     MainForm.SaveTab.Enabled := IsLengthCorrect And CheckSGSepOnValidity(ArrayOfSep);
 
     // ===Calculate_Result===
@@ -1045,10 +1044,10 @@ Begin
     //
 
     // ===Show_Result===
+    PrepareSGStrings(SGChangedStrings);
     FillVertGridByArrayData(ArrayOfChangedStrings, SGChangedStrings);
     MainForm.SGChangedStrings.Visible := True;
     MainForm.LabelChangedStrings.Visible := True;
-    MainForm.LabelChangedStrings.Caption := 'Строки после форматирования: ' + IntToStr(AnswerNumber);
     //
 End;
 
@@ -1241,35 +1240,47 @@ End;
 Function WriteDataToFile(Var SavedFile: TextFile): ERROR_CODES;
 Var
     Error: ERROR_CODES;
-    ArrLength, ArrHigh, I: Integer;
-    StringGridAArray, StringGridResultArray: TArrayOS;
+    ArrSepLen, ArrStringsLen, I: Integer;
+    ArrayOfSep, ArrayOfStrings, ArrayOfChangedStrings: TArrayOS;
 Begin
     Error := NO_ERRORS;
-    ArrLength := 0;
-    StringGridAArray := Nil;
-    StringGridResultArray := Nil;
+    ArrSepLen := 0;
+    ArrStringsLen := 0;
+    ArrayOfSep := Nil;
+    ArrayOfStrings := Nil;
+    ArrayOfChangedStrings := Nil;
 
-    ArrLength := StrToInt(MainForm.EditSepLength.Text);
-    ArrHigh := ArrLength - 1;
-    StringGridAArray := GetStringArrayFromHorGrid(MainForm.SGSeparators);
-    StringGridResultArray := Copy(StringGridAArray);
-
-    For I := 0 To ArrHigh Do
-    Begin
-        StringGridResultArray[I] := IntToStr(StrToInt(StringGridResultArray[I]) * 2 + I + 1);
-    End;
+    ArrSepLen := StrToInt(MainForm.EditSepLength.Text);
+    ArrStringsLen := StrToInt(MainForm.EditLengthStrings.Text);
+    ArrayOfSep := GetStringArrayFromHorGrid(MainForm.SGSeparators);
+    ArrayOfStrings := GetStringArrayFromVertGrid(MainForm.SGStrings);
+    ArrayOfChangedStrings := GetStringArrayFromVertGrid(MainForm.SGChangedStrings);
 
     Try
         Rewrite(SavedFile);
-        WriteLn(SavedFile, MainForm.EditSepLength.Text);
 
-        For I := 0 To ArrHigh - 1 Do
+        WriteLn(SavedFile, ArrSepLen);
+
+        For I := 0 To (ArrSepLen - 1) Do
         Begin
-            Write(SavedFile, StringGridAArray[I], ' ');
+            WriteLn(SavedFile, ArrayOfSep[I]);
         End;
-        Write(SavedFile, StringGridAArray[High(StringGridAArray)]);
+
+        WriteLn(SavedFile, ArrStringsLen);
+
+        For I := 0 To (ArrStringsLen - 2) Do
+        Begin
+            WriteLn(SavedFile, ArrayOfStrings[I]);
+        End;
+        Write(SavedFile, ArrayOfStrings[High(ArrayOfStrings)]);
+        WriteLn(SavedFile);
         WriteLn(SavedFile);
 
+        For I := 0 To (ArrStringsLen - 2) Do
+        Begin
+            WriteLn(SavedFile, ArrayOfChangedStrings[I]);
+        End;
+        Write(SavedFile, ArrayOfChangedStrings[High(ArrayOfChangedStrings)]);
 
         CloseFile(SavedFile);
     Except
@@ -1287,18 +1298,15 @@ Const
     MIN_ELEMENT: Integer = -9999;
 Var
     Error: ERROR_CODES;
-    ArrLength, ArrHigh, I, AnswerNumber: Integer;
-    ArrLengthStr, FinalString: String;
-    GridAArray: TArrayOS;
+    ArrSepLen, ArrStringsLen, I: Integer;
+    ArrayOfSep, ArrayOfStrings, ArrayOfChangedStrings: TArrayOS;
 Begin
-    ArrLength := 0;
-    ArrHigh := 0;
-    I := 0;
-    AnswerNumber := 0;
-    ArrLengthStr := '';
-    FinalString := '';
-    GridAArray := Nil;
     Error := NO_ERRORS;
+    ArrSepLen := 0;
+    ArrStringsLen := 0;
+    ArrayOfSep := Nil;
+    ArrayOfStrings := Nil;
+    ArrayOfChangedStrings := Nil;
 
     Try
         Reset(ReadedFile);
@@ -1310,75 +1318,128 @@ Begin
         If EOF(ReadedFile) Then
             Error := (FILE_DATA_NOT_CORRECT)
         Else
-            ReadLn(ReadedFile, ArrLengthStr);
-
-        ArrLength := StrToInt(ArrLengthStr);
-        ArrHigh := ArrLength - 1;
+            ReadLn(ReadedFile, ArrSepLen);
     Except
         Error := FILE_DATA_NOT_CORRECT;
     End;
 
     If Error = NO_ERRORS Then
     Begin
-        If (ArrLength < MIN_LENGTH) Or (ArrLength > MAX_LENGTH) Then
+        If (ArrSepLen < MIN_LENGTH) Or (ArrSepLen > MAX_LENGTH) Then
         Begin
-            GridAArray := Nil;
             Error := FILE_DATA_NOT_CORRECT;
         End
         Else
         Begin
-            SetLength(GridAArray, ArrLength);
+            SetLength(ArrayOfSep, ArrSepLen);
         End;
     End;
 
     If (Error = NO_ERRORS) Then
     Begin
 
-        For I := 0 To ArrHigh Do
+        For I := 0 To (ArrSepLen - 1) Do
         Begin
             If Error = NO_ERRORS Then
             Begin
 
                 If EOF(ReadedFile) Then
                 Begin
-                    GridAArray := Nil;
                     Error := FILE_DATA_NOT_CORRECT;
                 End;
 
                 Try
-                    Read(ReadedFile, GridAArray[I]);
-//                    If (GridAArray[I] > MAX_ELEMENT) Or (GridAArray[I] < MIN_ELEMENT) Then
-//                        Error := FILE_DATA_NOT_CORRECT;
+                    ReadLn(ReadedFile, ArrayOfSep[I]);
                 Except
-                    GridAArray := Nil;
                     Error := FILE_DATA_NOT_CORRECT;
                 End;
 
             End;
         End;
 
-        If Not(EOF(ReadedFile)) Then
+    End;
+
+    Try
+        If EOF(ReadedFile) Then
+            Error := (FILE_DATA_NOT_CORRECT)
+        Else
+            ReadLn(ReadedFile, ArrStringsLen);
+    Except
+        Error := FILE_DATA_NOT_CORRECT;
+    End;
+
+    If Error = NO_ERRORS Then
+    Begin
+        If (ArrStringsLen < MIN_LENGTH) Or (ArrStringsLen > MAX_LENGTH) Then
         Begin
-            GridAArray := Nil;
             Error := FILE_DATA_NOT_CORRECT;
+        End
+        Else
+        Begin
+            SetLength(ArrayOfStrings, ArrStringsLen);
+            SetLength(ArrayOfChangedStrings, ArrStringsLen);
+        End;
+    End;
+
+    If (Error = NO_ERRORS) Then
+    Begin
+
+        For I := 0 To (ArrStringsLen - 1) Do
+        Begin
+            If Error = NO_ERRORS Then
+            Begin
+
+                If EOF(ReadedFile) Then
+                Begin
+                    Error := FILE_DATA_NOT_CORRECT;
+                End;
+
+                Try
+                    ReadLn(ReadedFile, ArrayOfStrings[I]);
+                Except
+                    Error := FILE_DATA_NOT_CORRECT;
+                End;
+
+            End;
         End;
 
     End;
 
+    If Not(EOF(ReadedFile)) Then
+        Begin
+            Error := FILE_DATA_NOT_CORRECT;
+        End;
+
     CloseFile(ReadedFile);
 
-    If (Error = NO_ERRORS) And Not(GridAArray = Nil) Then
+    If (Error = NO_ERRORS) And Not(ArrayOfSep = Nil) And Not(ArrayOfStrings = Nil) Then
     Begin
-        MainForm.EditSepLength.Text := IntToStr(ArrLength);
-
-        MainForm.LabelChangedStrings.Visible := True;
+        MainForm.EditSepLength.Text := IntToStr(ArrSepLen);
+        MainForm.EditLengthStrings.Text := IntToStr(ArrStringsLen);
 
         // ===Calculate_Result===
-
+        ArrayOfChangedStrings := GetChangedStrings(ArrayOfStrings, ArrayOfSep);
         //
 
         // ===Show_Result===
-        FillHorGridByArrayData(GridAArray, MainForm.SGSeparators);
+        FillHorGridByArrayData(ArrayOfSep, MainForm.SGSeparators);
+        FillVertGridByArrayData(ArrayOfStrings, MainForm.SGStrings);
+        FillVertGridByArrayData(ArrayOfChangedStrings, MainForm.SGChangedStrings);
+
+        MainForm.LabelChangedStrings.Visible := True;
+        MainForm.SGChangedStrings.Visible := True;
+
+        MainForm.LabelLength.Visible := True;
+
+        MainForm.EditLengthStrings.Visible := True;
+        MainForm.LabelLengthStrings.Visible := True;
+
+        MainForm.SGStrings.Visible := True;
+
+        MainForm.EditSepLength.Visible := True;
+        MainForm.LabelStrings.Visible := True;
+
+        IsDataSaved := False;
         //
     End;
 
