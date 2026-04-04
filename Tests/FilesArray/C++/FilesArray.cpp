@@ -243,7 +243,7 @@ int *readArrayFromFile(const int MIN_NUMBER, const int MAX_NUMBER, string filePa
     return array1;
 }
 
-int *readArrayFromConsole(const int MIN_NUMBER, const int MAX_NUMBER, int &arraySize)
+int *fillArrayFromConsolereadArrayFromConsole(const int MIN_NUMBER, const int MAX_NUMBER, int &arraySize)
 {
     const int MIN_LENGTH = 1;
     const int MAX_LENGTH = 100;
