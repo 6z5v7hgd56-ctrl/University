@@ -68,24 +68,24 @@ BottomMiddelPanelData=0000080001020200000009000000446F636B5369746530100000004772
 [View0]
 CustomEditViewType=TEditView
 Module=C:\GitHub\University\Forms\Lab3_3\Unit1.pas
-CursorX=39
-CursorY=70
-TopLine=1
+CursorX=244
+CursorY=901
+TopLine=453
 LeftCol=1
-Elisions={{131,61},{183,3},{''}}{{185,46},{285,3},{''}}{{287,47},{309,3},{''}}{{311,58},{325,3},{''}}{{327,51},{343,3},{''}}{{345,50},{361,3},{''}}{{363,104},{392,3},{''}}
+Elisions={{185,46},{285,3},{''}}{{287,47},{309,3},{''}}{{311,58},{325,3},{''}}{{327,51},{343,3},{''}}{{345,50},{361,3},{''}}{{363,104},{392,3},{''}}
 Bookmarks=
-EditViewName=Borland.FormDesignerView
+EditViewName=C:\GitHub\University\Forms\Lab3_3\Unit1.pas
 
 [View1]
 CustomEditViewType=TEditView
 Module=C:\GitHub\University\Forms\Lab3_3\Unit2.pas
 CursorX=1
-CursorY=1
+CursorY=4
 TopLine=1
 LeftCol=1
 Elisions=
 Bookmarks=
-EditViewName=Borland.FormDesignerView
+EditViewName=C:\GitHub\University\Forms\Lab3_3\Unit2.pas
 
 [Watches]
 Count=0
@@ -215,7 +215,7 @@ MaxLeft=-1
 MaxTop=-1
 ClientWidth=1895
 ClientHeight=7085
-TBDockHeight=8784
+TBDockHeight=9009
 LRDockWidth=1895
 Dockable=1
 StayOnTop=0
@@ -223,7 +223,7 @@ SplitPos=111
 
 [PropInspDesignerSelection]
 ArrangeBy=Name
-SelectedItem=Hint,
+SelectedItem=Caption,
 ExpandedItems=Anchors=0,Constraints=1,Font=0,BorderIcons=0,CustomTitleBar=0,GlassFrame=0,HorzScrollBar=0,LiveBindings=0,"LiveBindings Designer=0",Margins=0,Menu=0,Padding=0,StyleElements=0,Touch=0,VertScrollBar=0,Touch.InteractiveGestureOptions=0,Touch.InteractiveGestures=0,Touch.TabletOptions=0
 
 [frmDesignPreview]
@@ -251,8 +251,8 @@ Create=1
 Visible=0
 Docked=1
 State=0
-Left=-137
-Top=-345
+Left=-8
+Top=-8
 Width=1848
 Height=3140
 MaxLeft=-1
@@ -676,7 +676,7 @@ MaxLeft=-1
 MaxTop=-1
 ClientWidth=1156
 ClientHeight=4511
-TBDockHeight=8784
+TBDockHeight=7181
 LRDockWidth=1156
 Dockable=1
 StayOnTop=0
@@ -700,7 +700,7 @@ MaxLeft=-1
 MaxTop=-1
 ClientWidth=1895
 ClientHeight=360
-TBDockHeight=8784
+TBDockHeight=9009
 LRDockWidth=1895
 Dockable=1
 StayOnTop=0
@@ -724,7 +724,7 @@ MaxLeft=-1
 MaxTop=-1
 ClientWidth=1156
 ClientHeight=2934
-TBDockHeight=8784
+TBDockHeight=7181
 LRDockWidth=1156
 Dockable=1
 StayOnTop=0

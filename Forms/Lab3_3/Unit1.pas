@@ -161,6 +161,8 @@ Begin
         Inc(Index);
     End;
 
+    GuideForm.GuideLabel.Caption := 'bobob';
+
     If (I = Length(Array1)) And (J < Length(Array2)) Then
     Begin
         For NewIndex := Index To High(AnswerArray) Do
