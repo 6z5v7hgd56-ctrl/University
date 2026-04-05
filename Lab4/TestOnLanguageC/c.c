@@ -14,29 +14,39 @@ _Bool checkMyFile(char fPath[], _Bool isToRead);
 
 //* Service
 void printPurpose();
+void showMenu();
 int scanInt(const int MIN_NUMBER, const int MAX_NUMBER, const char myString[]);
 void askTheFilePath(char *buffer, int bufferSize);
 void assignFile(char *fPath, int pathSize, _Bool isToRead);
+void menuStage();
+void readingStage(int **dataArray, int *arraySize);
 
 //*
 
 //* Array operations
-void fillArrayFromConsole(int **arr, int *n);
-void writeArrayIntoConsole(const int arr[], const size_t n);
+void fillArray(int **arr, int *len);
+void fillArrayFromConsole(int **arr, int *len);
+void fillArrayFromFile(int **arr, int *len);
+
+void writeArray(const int arr[], const int n);
+void writeArrayIntoConsole(const int arr[], const int n);
+void writeArrayIntoFile(const int arr[], const int n);
 //*
 
 int main(void)
 {
     const int maxBuffer = 255;
 
-    int a;
-    char fPath[maxBuffer];
+    // int a;
+    // char fPath[maxBuffer];
 
     setlocale(LC_ALL, "Russian");
 
     printPurpose();
 
-    assignFile(fPath, maxBuffer, 1);
+    // assignFile(fPath, maxBuffer, 1);
+
+    menuStage();
 
     return 0;
 }
@@ -44,6 +54,20 @@ int main(void)
 void printPurpose()
 {
     printf("PURPOSE_PURPOSE_PURPOSE\n\n");
+}
+
+void showMenu()
+{
+    printf("\n====== Меню =====\n");
+    printf("0 - Выход\n");
+    printf("1 - Ввести массив\n");
+    printf("2 - Получить результат\n");
+    printf("3 - Изменить массив\n");
+    printf("4 - Помощь\n");
+}
+
+void fillArrayMenu()
+{
 }
 
 int scanInt(const int MIN_NUMBER, const int MAX_NUMBER, const char myString[])
@@ -148,11 +172,11 @@ _Bool checkIsEmpty(const char fPath[])
 // {
 //     FILE *testFileRead, *testFileWrite;
 //     _Bool isGood;
-
+//
 //     isGood = 0;
-
+//
 //     testFileRead = fopen(fPath, "r");
-
+//
 //     if (testFileRead == NULL)
 //     {
 //         printf("Error, file with path <%s> is not exists or cannot be read.\n", fPath);
@@ -160,13 +184,13 @@ _Bool checkIsEmpty(const char fPath[])
 //     else
 //     {
 //         fclose(testFileRead);
-
+//
 //         if (!checkIsFileText(fPath))
 //             printf("Error, filename is not .txt\n");
-//         else 
+//         else
 //             if (isToRead && !canRead(fPath))
 //                 printf("Error, no access to read the file or file do not exists.\n");
-//             else 
+//             else
 //                 if (!isToRead && !canWrite(fPath))
 //                     printf("Error, no access to write into the file.\n");
 //                 else
@@ -175,10 +199,9 @@ _Bool checkIsEmpty(const char fPath[])
 //                     printf("Assigning is completed successfully.\n");
 //                 }
 //     }
-
+//
 //     return isGood;
 // }
-
 
 _Bool checkMyFile(char fPath[], _Bool isToRead)
 {
@@ -189,7 +212,7 @@ _Bool checkMyFile(char fPath[], _Bool isToRead)
 
     isGood = 0;
 
-    //testFileRead = fopen(fPath, "r");
+    // testFileRead = fopen(fPath, "r");
 
     if (_access(fPath, EXIST_MODE) != 0)
     {
@@ -197,21 +220,19 @@ _Bool checkMyFile(char fPath[], _Bool isToRead)
     }
     else
     {
-        //fclose(testFileRead);
+        // fclose(testFileRead);
 
         if (!checkIsFileText(fPath))
             printf("Error, filename is not .txt\n");
-        else 
-            if (isToRead && !canRead(fPath))
-                printf("Error, no access to read the file.\n");
-            else 
-                if (!isToRead && !canWrite(fPath))
-                    printf("Error, no access to write into the file.\n");
-                else
-                {
-                    isGood = 1;
-                    printf("Assigning is completed successfully.\n");
-                }
+        else if (isToRead && !canRead(fPath))
+            printf("Error, no access to read the file.\n");
+        else if (!isToRead && !canWrite(fPath))
+            printf("Error, no access to write into the file.\n");
+        else
+        {
+            isGood = 1;
+            printf("Assigning is completed successfully.\n");
+        }
     }
 
     return isGood;
@@ -238,7 +259,7 @@ void assignFile(char *fPath, int pathSize, _Bool isToRead)
 
     isIncorrect = 0;
 
-    printf("===== ASSIGNING =====\n");
+    printf("\n====== ASSIGNING ======\n");
 
     do
     {
@@ -249,38 +270,90 @@ void assignFile(char *fPath, int pathSize, _Bool isToRead)
     printf("\n");
 }
 
-void fillArrayFromConsole(int **arr, int *n)
+void fillArray(int **arr, int *len)
+{
+    int inputMethod;
+
+    inputMethod = 0;
+
+    printf("\n====== Метод ввода ======\n");
+    printf("0 - Ввод через консоль\n");
+    printf("1 - Ввод через файл\n\n");
+
+    inputMethod = scanInt(0, 1, "> ");
+
+    if (inputMethod == 0)
+    {
+        fillArrayFromConsole(arr, len);
+    }
+    else
+        fillArrayFromFile(arr, len);
+}
+
+void fillArrayFromConsole(int **arr, int *len)
 {
     int testLen, i;
+    int *temp;
 
-    *n = 0;
     testLen = 0;
 
-    printf("Введите длину массива: ");
-    scanf("%d", &testLen);
+    printf("Введите длину массива\n");
+    testLen = scanInt(1, 100, "> ");
 
-    if (testLen > 0)
+    if (*arr == NULL)
     {
-        *n = testLen;
-        *arr = (int *)malloc(*n * sizeof(int));
-
-        for (i = 0; i < *n; i++)
-        {
-            printf("Элемент [%d]: ", i + 1);
-            scanf("%d", &(*arr)[i]);
-        }
+        *arr = (int *)malloc(testLen * sizeof(int));
+        *len = testLen;
     }
     else
     {
-        printf("Ошибка, не положительная длина массива.\n");
-        *arr = NULL;
-        *n = 0;
+        temp = (int *)realloc(*arr, testLen * sizeof(int));
+
+        if ((temp) == NULL)
+        {
+            printf("Ошибка при изменении массива.");
+        }
+        else
+        {
+            *arr = (int *)malloc(testLen * sizeof(int));
+            memcpy(*arr, temp, sizeof(temp));
+            free(temp);
+            *len = testLen;
+        }
+    }
+
+    for (i = 0; i < *len; i++)
+    {
+        printf("Элемент [%d]: ", i + 1);
+        scanf("%d", &(*arr)[i]);
     }
 }
 
-void writeArrayIntoConsole(const int arr[], const size_t n)
+void fillArrayFromFile(int **arr, int *n)
 {
-    size_t i;
+}
+
+void writeArray(const int *arr, const int n)
+{
+    int outputMethod;
+
+    outputMethod = 0;
+
+    printf("\n====== Метод вывода ======\n");
+    printf("0 - Вывод в консоль\n");
+    printf("1 - Вывод в файл\n\n");
+
+    outputMethod = scanInt(0, 1, "> ");
+
+    if (outputMethod == 0)
+        writeArrayIntoConsole(arr, n);
+    else
+        writeArrayIntoFile(arr, n);
+}
+
+void writeArrayIntoConsole(const int *arr, const int n)
+{
+    int i;
     i = 0;
 
     if (arr != NULL && n != 0)
@@ -295,6 +368,10 @@ void writeArrayIntoConsole(const int arr[], const size_t n)
         printf("Ошибка состояния массива.\n");
 }
 
+void writeArrayIntoFile(const int *arr, const int n)
+{
+}
+
 void readingStage(int **dataArray, int *arraySize)
 {
     const int MIN_NUMBER = -10000;
@@ -306,7 +383,7 @@ void readingStage(int **dataArray, int *arraySize)
 
     isToRead = 0;
     isAllUndone = 0;
-    //isFromFile = workWithConsoleOrFile(isOutput); //! ИЗМЕНИТЬ
+    // isFromFile = workWithConsoleOrFile(isOutput); //! ИЗМЕНИТЬ
 
     if (isFromFile)
     {
@@ -315,7 +392,7 @@ void readingStage(int **dataArray, int *arraySize)
         do
         {
             assignFile(fPath, MAX_BUFFER, isToRead);
-            //dataArray = readArrayFromFile(MIN_NUMBER, MAX_NUMBER, fPath, arraySize);
+            // dataArray = readArrayFromFile(MIN_NUMBER, MAX_NUMBER, fPath, arraySize);
 
             if (dataArray == 0)
                 printf("Error with reading data, bad file read.\n");
@@ -326,4 +403,45 @@ void readingStage(int **dataArray, int *arraySize)
     }
     else
         fillArrayFromConsole(dataArray, arraySize);
+}
+
+void menuStage()
+{
+    const int MIN_MENU = 0;
+    const int MAX_MENU = 4;
+
+    _Bool isDoNotStop;
+    int menuOption;
+    int *dataArray, arrayLength;
+
+    isDoNotStop = 1;
+    menuOption = 0;
+    dataArray = NULL;
+    arrayLength = 0;
+
+    do
+    {
+        showMenu();
+
+        printf("\n");
+        menuOption = scanInt(MIN_MENU, MAX_MENU, "> ");
+
+        if (menuOption == 1)
+        {
+            fillArray(&dataArray, &arrayLength);
+        }
+        else if (menuOption == 2)
+        {
+            writeArray(dataArray, arrayLength);
+        }
+        else if (menuOption == 3)
+        {
+        }
+        else if (menuOption == 4)
+        {
+        }
+        else if (menuOption == 0) // ! В последнюю очередь
+            isDoNotStop = 0;
+
+    } while (isDoNotStop);
 }
