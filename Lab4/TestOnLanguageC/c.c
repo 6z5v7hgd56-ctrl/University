@@ -292,12 +292,15 @@ void fillArray(int **arr, int *len)
 
 void fillArrayFromConsole(int **arr, int *len)
 {
+    const int MIN_ELEMENT = -1000000;
+    const int MAX_ELEMENT =  1000000;
+
     int testLen, i;
     int *temp;
 
     testLen = 0;
 
-    printf("Введите длину массива\n");
+    printf("\nВведите длину массива\n");
     testLen = scanInt(1, 100, "> ");
 
     if (*arr == NULL)
@@ -324,8 +327,8 @@ void fillArrayFromConsole(int **arr, int *len)
 
     for (i = 0; i < *len; i++)
     {
-        printf("Элемент [%d]: ", i + 1);
-        scanf("%d", &(*arr)[i]);
+        printf("Элемент [%d]: \n", i + 1);
+        (*arr)[i] = scanInt(MIN_ELEMENT, MAX_ELEMENT, "> ");
     }
 }
 
@@ -339,16 +342,23 @@ void writeArray(const int *arr, const int n)
 
     outputMethod = 0;
 
-    printf("\n====== Метод вывода ======\n");
-    printf("0 - Вывод в консоль\n");
-    printf("1 - Вывод в файл\n\n");
-
-    outputMethod = scanInt(0, 1, "> ");
-
-    if (outputMethod == 0)
-        writeArrayIntoConsole(arr, n);
+    if (arr == NULL) 
+    {
+        printf("\nМассив пуст, сначала введите массив.\n");    
+    }
     else
-        writeArrayIntoFile(arr, n);
+    {
+        printf("\n====== Метод вывода ======\n");
+        printf("0 - Вывод в консоль\n");
+        printf("1 - Вывод в файл\n\n");
+
+        outputMethod = scanInt(0, 1, "> ");
+
+        if (outputMethod == 0)
+            writeArrayIntoConsole(arr, n);
+        else
+            writeArrayIntoFile(arr, n);
+    }
 }
 
 void writeArrayIntoConsole(const int *arr, const int n)
@@ -370,6 +380,11 @@ void writeArrayIntoConsole(const int *arr, const int n)
 
 void writeArrayIntoFile(const int *arr, const int n)
 {
+}
+
+void changeElement(int **arr, int *n)
+{
+
 }
 
 void readingStage(int **dataArray, int *arraySize)
@@ -430,18 +445,24 @@ void menuStage()
         {
             fillArray(&dataArray, &arrayLength);
         }
-        else if (menuOption == 2)
-        {
-            writeArray(dataArray, arrayLength);
-        }
-        else if (menuOption == 3)
-        {
-        }
-        else if (menuOption == 4)
-        {
-        }
-        else if (menuOption == 0) // ! В последнюю очередь
-            isDoNotStop = 0;
+        else 
+            if (menuOption == 2)
+            {
+                writeArray(dataArray, arrayLength);
+            }
+            else 
+                if (menuOption == 3)
+                {
+                    changeElement(&dataArray, &arrayLength);    
+                }
+                else 
+                    if (menuOption == 4)
+                {
+
+                }
+                else 
+                    if (menuOption == 0) // ! В последнюю очередь
+                        isDoNotStop = 0;
 
     } while (isDoNotStop);
 }
