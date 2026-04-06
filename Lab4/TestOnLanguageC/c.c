@@ -342,13 +342,15 @@ void writeArray(const int *arr, const int n)
 
     outputMethod = 0;
 
+    printf("\n====== Вывод массива ======\n");
+
     if (arr == NULL) 
     {
-        printf("\nМассив пуст, сначала введите массив.\n");    
+        printf("Массив пуст, сначала введите массив через соответствующий пункт меню..\n");    
     }
     else
     {
-        printf("\n====== Метод вывода ======\n");
+        printf("Выберите метод вывода массива:\n");
         printf("0 - Вывод в консоль\n");
         printf("1 - Вывод в файл\n\n");
 
@@ -384,7 +386,35 @@ void writeArrayIntoFile(const int *arr, const int n)
 
 void changeElement(int **arr, int *n)
 {
+    const int MIN_ELEMENT = -1000000;
+    const int MAX_ELEMENT =  1000000;
+    
+    int newElement, index;
 
+    newElement = 0;
+    index = 0;
+
+    printf("\n====== Изменение элемента ======\n");
+
+    if (*arr == NULL) 
+    {
+        printf("Изменение массива невозможно, так как массив пуст. Сначала введите массив через соответствующий пункт меню.\n");
+    }
+    else
+    {
+
+        printf("Введённый массив: ");
+        writeArrayIntoConsole(*arr, *n);
+        printf("Введите индекс элемента, который хотите изменить в диапазоне [1;%d]:\n", *n);
+    
+        index = scanInt(1, *n, "> ");
+    
+        printf("Вы хотите заменить элемент под номером %d со значением %d на новое значение:\n");
+        newElement = scanInt(MIN_ELEMENT, MAX_ELEMENT, "> ");
+    
+        (*arr)[index - 1] = newElement;
+        printf("Элемент успешно изменён.");
+    }
 }
 
 void readingStage(int **dataArray, int *arraySize)
