@@ -3,6 +3,7 @@
 #include <string.h>
 #include <locale.h>
 #include <io.h>
+#include <ctype.h>
 
 //* Tests
 _Bool checkIsFileText(char fPath[]);
@@ -18,8 +19,8 @@ void showMenu();
 int scanInt(const int MIN_NUMBER, const int MAX_NUMBER, const char myString[]);
 void askTheFilePath(char *buffer, int bufferSize);
 void assignFile(char *fPath, int pathSize, _Bool isToRead);
-void menuStage();
-void readingStage(int **dataArray, int *arraySize);
+void menuStage(int **dataArray, int *arrayLength);
+void readingStage(int **dataArray, int *arraySize); 
 
 //*
 
@@ -33,24 +34,23 @@ void writeArrayIntoConsole(const int arr[], const int n);
 void writeArrayIntoFile(const int arr[], const int n);
 //*
 
-void quicksort(int **dataArray, int *arrayLength);
+void swap(int **dataArray, int i, int j);
+int partition(int **dataArray, const int arrayLength, int low, int high);
+void quicksort(int **dataArray, const int arrayLength, int low, int high);
 
 int main(void)
 {
-    const int maxBuffer = 255;
+    int *dataArray, arrayLength;
 
-    // int a;
-    // char fPath[maxBuffer];
+    dataArray = NULL;
+    arrayLength = 0;
 
     setlocale(LC_ALL, "Russian");
 
     printPurpose();
-
-    // assignFile(fPath, maxBuffer, 1);
-
-    menuStage();
-
-    return 0;
+    menuStage(&dataArray, &arrayLength);
+    
+    return 0; // TODO Удалять массив в конце работы программы
 }
 
 void printPurpose()
@@ -65,48 +65,44 @@ void showMenu()
     printf("1 - Ввести массив\n");
     printf("2 - Отсортировать массив\n");
     printf("3 - Вывести массив\n");
-    printf("4 - Изменить массив\n");
+    printf("4 - Изменить элемент массива\n");
     printf("5 - Помощь\n");
 }
 
 void writeHelp()
 {
     printf("\n====== Помощь ======\n");
-    printf("Программа позволяет вводить массив через консоль либо через файл, выводить его в консоль либо массив, изменить отдельный элемент массива.");
-}
-
-void fillArrayMenu()
-{
+    printf("Программа позволяет вводить массив через консоль либо через файл, выводить его в консоль либо массив, изменить отдельный элемент массива. \nВводить значения нужно используя стандартные символы ASCII.\n");
 }
 
 int scanInt(const int MIN_NUMBER, const int MAX_NUMBER, const char myString[])
 {
     _Bool isIncorrect;
     int number;
+    char ch;
 
     isIncorrect = 0;
     number = 0;
+    ch = 0;
 
     do
     {
         printf(myString);
         isIncorrect = 0;
 
-        if (scanf("%d", &number) != 1) // ! Считает 5 если написать "5abcd"
+        if (scanf("%d%c", &number, &ch) == 0 || !(isspace(ch) || ch == EOF) )
         {
             isIncorrect = 1;
             printf("Incorrect input, try again.\n");
+            if (isIncorrect)
+                while (getchar() != '\n');
         }
-
+        
         if (!isIncorrect && ((number < MIN_NUMBER) || (number > MAX_NUMBER)))
         {
             isIncorrect = 1;
             printf("The number must fit the range [%d,%d]\n", MIN_NUMBER, MAX_NUMBER);
         }
-
-        if (isIncorrect)
-            while (getchar() != '\n')
-                ;
 
     } while (isIncorrect);
 
@@ -426,24 +422,72 @@ void changeElement(int **arr, int *n)
     }
 }
 
-void quicksort(int **dataArray, int *arrayLength)
+void swap(int **dataArray, int i, int j)
 {
-
+    (*dataArray)[i] = (*dataArray)[i] + (*dataArray)[j];
+    (*dataArray)[j] = (*dataArray)[i] - (*dataArray)[j];
+    (*dataArray)[i] = (*dataArray)[i] - (*dataArray)[j];
 }
 
-void menuStage()
+int partition(int **dataArray, const int arrayLength, int low, int high)
+{
+    int pivot, randomIndex, i, j;
+    _Bool isDoNotStop;
+
+    randomIndex = 0;
+    pivot = 0;
+    i = low;
+    j = high;
+    isDoNotStop = 1;
+
+    randomIndex = low + rand() % (high - low);
+    pivot = (*dataArray)[randomIndex];
+
+    while (isDoNotStop)
+    {
+        while ((*dataArray)[i] < pivot) 
+            i = i + 1;
+        
+        while ((*dataArray)[j] > pivot) 
+            j = j - 1;
+
+        if (i >= j)
+            isDoNotStop = 0;
+        else    
+            swap(dataArray, i++, j--);
+    }
+
+    return j;
+}
+
+void quicksort(int **dataArray, const int arrayLength, int low, int high)
+{
+    int point;
+    point = 0;
+
+    printf("\n====== Сортировка ======\n");
+
+    if (*dataArray == NULL)
+        printf("Массив пуст, сначала введите массив через соответствующий пункт меню.\n");
+    else
+        if (low < high)
+        {
+            point = partition(dataArray, arrayLength, low, high);
+            quicksort(&(*dataArray), arrayLength, low, point);
+            quicksort(&(*dataArray), arrayLength, point + 1, high);
+        }
+}
+
+void menuStage(int **dataArray, int *arrayLength)
 {
     const int MIN_MENU = 0;
     const int MAX_MENU = 5;
 
     _Bool isDoNotStop;
     int menuOption;
-    int *dataArray, arrayLength;
 
     isDoNotStop = 1;
     menuOption = 0;
-    dataArray = NULL;
-    arrayLength = 0;
 
     do
     {
@@ -454,22 +498,22 @@ void menuStage()
 
         if (menuOption == 1)
         {
-            fillArray(&dataArray, &arrayLength);
+            fillArray(&*dataArray, &*arrayLength);
         }
         else 
             if (menuOption == 2)  
             {
-                quicksort(&dataArray, &arrayLength);
+                quicksort(&*dataArray, *arrayLength, 0, *arrayLength - 1);
             }
             else 
                 if (menuOption == 3)
                 {
-                    writeArray(dataArray, arrayLength);  
+                    writeArray(*dataArray, *arrayLength);  
                 }
                 else 
                     if (menuOption == 4)
                     {
-                        changeElement(&dataArray, &arrayLength); 
+                        changeElement(&*dataArray, &*arrayLength); 
                     }
                     else 
                         if (menuOption == 5)
@@ -477,7 +521,7 @@ void menuStage()
                             writeHelp(); 
                         }
                         else
-                            if (menuOption == 0) // ! В последнюю очередь
+                            if (menuOption == 0)
                                 isDoNotStop = 0;
 
     } while (isDoNotStop);
