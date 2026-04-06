@@ -33,6 +33,8 @@ void writeArrayIntoConsole(const int arr[], const int n);
 void writeArrayIntoFile(const int arr[], const int n);
 //*
 
+void quicksort(int **dataArray, int *arrayLength);
+
 int main(void)
 {
     const int maxBuffer = 255;
@@ -61,9 +63,16 @@ void showMenu()
     printf("\n====== Меню =====\n");
     printf("0 - Выход\n");
     printf("1 - Ввести массив\n");
-    printf("2 - Получить результат\n");
-    printf("3 - Изменить массив\n");
-    printf("4 - Помощь\n");
+    printf("2 - Отсортировать массив\n");
+    printf("3 - Вывести массив\n");
+    printf("4 - Изменить массив\n");
+    printf("5 - Помощь\n");
+}
+
+void writeHelp()
+{
+    printf("\n====== Помощь ======\n");
+    printf("Программа позволяет вводить массив через консоль либо через файл, выводить его в консоль либо массив, изменить отдельный элемент массива.");
 }
 
 void fillArrayMenu()
@@ -417,43 +426,15 @@ void changeElement(int **arr, int *n)
     }
 }
 
-void readingStage(int **dataArray, int *arraySize)
+void quicksort(int **dataArray, int *arrayLength)
 {
-    const int MIN_NUMBER = -10000;
-    const int MAX_NUMBER = 10000;
-    const int MAX_BUFFER = 255;
 
-    _Bool isFromFile, isAllUndone, isToRead;
-    char fPath[MAX_BUFFER];
-
-    isToRead = 0;
-    isAllUndone = 0;
-    // isFromFile = workWithConsoleOrFile(isOutput); //! ИЗМЕНИТЬ
-
-    if (isFromFile)
-    {
-        isAllUndone = 1;
-
-        do
-        {
-            assignFile(fPath, MAX_BUFFER, isToRead);
-            // dataArray = readArrayFromFile(MIN_NUMBER, MAX_NUMBER, fPath, arraySize);
-
-            if (dataArray == 0)
-                printf("Error with reading data, bad file read.\n");
-            else
-                isAllUndone = 0;
-
-        } while (isAllUndone);
-    }
-    else
-        fillArrayFromConsole(dataArray, arraySize);
 }
 
 void menuStage()
 {
     const int MIN_MENU = 0;
-    const int MAX_MENU = 4;
+    const int MAX_MENU = 5;
 
     _Bool isDoNotStop;
     int menuOption;
@@ -476,23 +457,28 @@ void menuStage()
             fillArray(&dataArray, &arrayLength);
         }
         else 
-            if (menuOption == 2)
+            if (menuOption == 2)  
             {
-                writeArray(dataArray, arrayLength);
+                quicksort(&dataArray, &arrayLength);
             }
             else 
                 if (menuOption == 3)
                 {
-                    changeElement(&dataArray, &arrayLength);    
+                    writeArray(dataArray, arrayLength);  
                 }
                 else 
                     if (menuOption == 4)
-                {
-
-                }
-                else 
-                    if (menuOption == 0) // ! В последнюю очередь
-                        isDoNotStop = 0;
+                    {
+                        changeElement(&dataArray, &arrayLength); 
+                    }
+                    else 
+                        if (menuOption == 5)
+                        {
+                            writeHelp(); 
+                        }
+                        else
+                            if (menuOption == 0) // ! В последнюю очередь
+                                isDoNotStop = 0;
 
     } while (isDoNotStop);
 }
