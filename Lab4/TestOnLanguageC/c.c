@@ -60,7 +60,6 @@ void printPurpose()
 
 void showMenu()
 {
-    printf("\n====== Меню =====\n");
     printf("0 - Выход\n");
     printf("1 - Ввести массив\n");
     printf("2 - Отсортировать массив\n");
@@ -71,7 +70,6 @@ void showMenu()
 
 void writeHelp()
 {
-    printf("\n====== Помощь ======\n");
     printf("Программа позволяет вводить массив через консоль либо через файл, выводить его в консоль либо массив, изменить отдельный элемент массива. \nВводить значения нужно используя стандартные символы ASCII.\n");
 }
 
@@ -173,41 +171,6 @@ _Bool checkIsEmpty(const char fPath[])
     return isEmpty;
 }
 
-// _Bool checkMyFile(char fPath[], _Bool isToRead)
-// {
-//     FILE *testFileRead, *testFileWrite;
-//     _Bool isGood;
-//
-//     isGood = 0;
-//
-//     testFileRead = fopen(fPath, "r");
-//
-//     if (testFileRead == NULL)
-//     {
-//         printf("Error, file with path <%s> is not exists or cannot be read.\n", fPath);
-//     }
-//     else
-//     {
-//         fclose(testFileRead);
-//
-//         if (!checkIsFileText(fPath))
-//             printf("Error, filename is not .txt\n");
-//         else
-//             if (isToRead && !canRead(fPath))
-//                 printf("Error, no access to read the file or file do not exists.\n");
-//             else
-//                 if (!isToRead && !canWrite(fPath))
-//                     printf("Error, no access to write into the file.\n");
-//                 else
-//                 {
-//                     isGood = 1;
-//                     printf("Assigning is completed successfully.\n");
-//                 }
-//     }
-//
-//     return isGood;
-// }
-
 _Bool checkMyFile(char fPath[], _Bool isToRead)
 {
     const int EXIST_MODE = 0;
@@ -217,27 +180,25 @@ _Bool checkMyFile(char fPath[], _Bool isToRead)
 
     isGood = 0;
 
-    // testFileRead = fopen(fPath, "r");
-
     if (_access(fPath, EXIST_MODE) != 0)
     {
         printf("Error, file with path <%s> is not exists or cannot be read.\n", fPath);
     }
     else
     {
-        // fclose(testFileRead);
-
         if (!checkIsFileText(fPath))
             printf("Error, filename is not .txt\n");
-        else if (isToRead && !canRead(fPath))
-            printf("Error, no access to read the file.\n");
-        else if (!isToRead && !canWrite(fPath))
-            printf("Error, no access to write into the file.\n");
-        else
-        {
-            isGood = 1;
-            printf("Assigning is completed successfully.\n");
-        }
+            else 
+                if (isToRead && !canRead(fPath))
+                    printf("Error, no access to read the file.\n");
+                else 
+                    if (!isToRead && !canWrite(fPath))
+                        printf("Error, no access to write into the file.\n");
+                    else
+                    {
+                        isGood = 1;
+                        printf("Assigning is completed successfully.\n");
+                    }
     }
 
     return isGood;
@@ -281,7 +242,6 @@ void fillArray(int **arr, int *len)
 
     inputMethod = 0;
 
-    printf("\n====== Метод ввода ======\n");
     printf("0 - Ввод через консоль\n");
     printf("1 - Ввод через файл\n\n");
 
@@ -347,8 +307,6 @@ void writeArray(const int *arr, const int n)
 
     outputMethod = 0;
 
-    printf("\n====== Вывод массива ======\n");
-
     if (arr == NULL) 
     {
         printf("Массив пуст, сначала введите массив через соответствующий пункт меню..\n");    
@@ -385,8 +343,29 @@ void writeArrayIntoConsole(const int *arr, const int n)
         printf("Ошибка состояния массива.\n");
 }
 
-void writeArrayIntoFile(const int *arr, const int n)
+void writeArrayIntoFile(const int *arr, const int n)2
 {
+    const int MAX_BUFFER = 255; 
+    
+    char fPath[MAX_BUFFER];
+    _Bool isToRead;
+    FILE *dataFile;
+    int i;
+
+    isToRead = 0;
+
+    assignFile(fPath, MAX_BUFFER, isToRead);
+    dataFile = fopen(fPath, "w");
+
+    fprintf(dataFile, "%d\n", n);
+
+    for (i = 0; i < n - 1; ++i)
+    {
+        fprintf(dataFile, "%d ", arr[i]);
+    }
+    fprintf(dataFile, "%d", arr[n - 1]);
+
+    fclose(dataFile);
 }
 
 void changeElement(int **arr, int *n)
@@ -398,8 +377,6 @@ void changeElement(int **arr, int *n)
 
     newElement = 0;
     index = 0;
-
-    printf("\n====== Изменение элемента ======\n");
 
     if (*arr == NULL) 
     {
@@ -465,8 +442,6 @@ void quicksort(int **dataArray, const int arrayLength, int low, int high)
     int point;
     point = 0;
 
-    printf("\n====== Сортировка ======\n");
-
     if (*dataArray == NULL)
         printf("Массив пуст, сначала введите массив через соответствующий пункт меню.\n");
     else
@@ -491,6 +466,7 @@ void menuStage(int **dataArray, int *arrayLength)
 
     do
     {
+        printf("\n====== Меню =====\n");
         showMenu();
 
         printf("\n");
@@ -498,26 +474,31 @@ void menuStage(int **dataArray, int *arrayLength)
 
         if (menuOption == 1)
         {
+            printf("\n====== Метод ввода ======\n");
             fillArray(&*dataArray, &*arrayLength);
         }
         else 
             if (menuOption == 2)  
             {
+                printf("\n====== Сортировка ======\n");
                 quicksort(&*dataArray, *arrayLength, 0, *arrayLength - 1);
             }
             else 
                 if (menuOption == 3)
                 {
+                    printf("\n====== Вывод массива ======\n");
                     writeArray(*dataArray, *arrayLength);  
                 }
                 else 
                     if (menuOption == 4)
                     {
+                        printf("\n====== Изменение элемента ======\n");
                         changeElement(&*dataArray, &*arrayLength); 
                     }
                     else 
                         if (menuOption == 5)
                         {
+                            printf("\n====== Помощь ======\n");
                             writeHelp(); 
                         }
                         else
