@@ -20,7 +20,7 @@ int scanInt(const int MIN_NUMBER, const int MAX_NUMBER, const char myString[]);
 void askTheFilePath(char *buffer, int bufferSize);
 void assignFile(char *fPath, int pathSize, _Bool isToRead);
 void menuStage(int **dataArray, int *arrayLength);
-void readingStage(int **dataArray, int *arraySize); 
+void readingStage(int **dataArray, int *arraySize);
 
 //*
 
@@ -30,13 +30,18 @@ void fillArrayFromConsole(int **arr, int *len);
 void fillArrayFromFile(int **arr, int *len);
 
 void writeArray(const int arr[], const int n);
-void writeArrayIntoConsole(const int arr[], const int n);
+void writeArrayIntoConsole(const int arr[], const int n, _Bool isNumbered);
 void writeArrayIntoFile(const int arr[], const int n);
+
 //*
 
 void swap(int **dataArray, int i, int j);
 int partition(int **dataArray, const int arrayLength, int low, int high);
 void quicksort(int **dataArray, const int arrayLength, int low, int high);
+
+void reallocSafe(int **destination, int *destLen, int *newLen);
+void freeSafeOneRef(int *data);
+void freeArray(int **arr, int *len);
 
 int main(void)
 {
@@ -49,13 +54,14 @@ int main(void)
 
     printPurpose();
     menuStage(&dataArray, &arrayLength);
-    
-    return 0; // TODO Удалять массив в конце работы программы
+    freeArray(&dataArray, &arrayLength);
+
+    return 0;
 }
 
 void printPurpose()
 {
-    printf("PURPOSE_PURPOSE_PURPOSE\n\n");
+    printf("PURPOSE_PURPOSE_PURPOSE\n");
 }
 
 void showMenu()
@@ -88,14 +94,13 @@ int scanInt(const int MIN_NUMBER, const int MAX_NUMBER, const char myString[])
         printf(myString);
         isIncorrect = 0;
 
-        if (scanf("%d%c", &number, &ch) == 0 || !(isspace(ch) || ch == EOF) )
+        if (scanf("%d%c", &number, &ch) == 0 || !(isspace(ch) || ch == EOF))
         {
             isIncorrect = 1;
-            printf("Incorrect input, try again.\n");
-            if (isIncorrect)
-                while (getchar() != '\n');
+            printf("Некорректный ввод, повторите попытку\n");
+            while (getchar() != '\n');
         }
-        
+
         if (!isIncorrect && ((number < MIN_NUMBER) || (number > MAX_NUMBER)))
         {
             isIncorrect = 1;
@@ -168,6 +173,8 @@ _Bool checkIsEmpty(const char fPath[])
 
     isEmpty = fgetc(testFile) == EOF;
 
+    fclose(testFile);
+
     return isEmpty;
 }
 
@@ -188,17 +195,15 @@ _Bool checkMyFile(char fPath[], _Bool isToRead)
     {
         if (!checkIsFileText(fPath))
             printf("Error, filename is not .txt\n");
-            else 
-                if (isToRead && !canRead(fPath))
-                    printf("Error, no access to read the file.\n");
-                else 
-                    if (!isToRead && !canWrite(fPath))
-                        printf("Error, no access to write into the file.\n");
-                    else
-                    {
-                        isGood = 1;
-                        printf("Assigning is completed successfully.\n");
-                    }
+        else if (isToRead && !canRead(fPath))
+            printf("Error, no access to read the file.\n");
+        else if (!isToRead && !canWrite(fPath))
+            printf("Error, no access to write into the file.\n");
+        else
+        {
+            isGood = 1;
+            printf("Assigning is completed successfully.\n");
+        }
     }
 
     return isGood;
@@ -232,8 +237,21 @@ void assignFile(char *fPath, int pathSize, _Bool isToRead)
         askTheFilePath(fPath, pathSize);
         isIncorrect = !checkMyFile(fPath, isToRead);
     } while (isIncorrect);
+}
 
-    printf("\n");
+void reallocSafe(int **destination, int *destLen, int *newLen)
+{
+    int *temp = realloc(*destination, *newLen);
+    
+    if (temp == NULL)
+    {
+        printf("Ошибка при изменении массива.\n");
+    }
+    else
+    {
+        *destination = temp;
+        *destLen = *newLen;
+    }
 }
 
 void fillArray(int **arr, int *len)
@@ -258,17 +276,19 @@ void fillArray(int **arr, int *len)
 void fillArrayFromConsole(int **arr, int *len)
 {
     const int MIN_ELEMENT = -1000000;
-    const int MAX_ELEMENT =  1000000;
+    const int MAX_ELEMENT = 1000000;
 
     int testLen, i;
-    int *temp;
+    int *temp, *oldArr;
 
     testLen = 0;
+    temp = NULL;
+    oldArr = NULL;
 
     printf("\nВведите длину массива\n");
     testLen = scanInt(1, 100, "> ");
 
-    if (*arr == NULL)
+    if (*arr == NULL) // ? Можно вынести во отдельную функцию
     {
         *arr = (int *)malloc(testLen * sizeof(int));
         *len = testLen;
@@ -283,9 +303,11 @@ void fillArrayFromConsole(int **arr, int *len)
         }
         else
         {
-            *arr = (int *)malloc(testLen * sizeof(int));
+            //*arr = (int *)malloc(testLen * sizeof(int));
+            oldArr = *arr;
             memcpy(*arr, temp, sizeof(temp));
             free(temp);
+            free(oldArr);
             *len = testLen;
         }
     }
@@ -297,19 +319,91 @@ void fillArrayFromConsole(int **arr, int *len)
     }
 }
 
-void fillArrayFromFile(int **arr, int *n)
+void fillArrayFromFile(int **arr, int *len)
 {
+    const int MAX_BUFFER = 255;
+    const int MIN_ELEMENT = -1000000;
+    const int MAX_ELEMENT =  1000000;
+
+    char fPath[MAX_BUFFER];
+    _Bool isToRead, isDataCorrect;
+    FILE *dataFile;
+    int i, testLen, *temp;
+
+    isToRead = 1;
+    isDataCorrect = 1;
+    testLen = 0;
+    temp = NULL;
+
+    assignFile(fPath, MAX_BUFFER, isToRead);
+    dataFile = fopen(fPath, "r");
+
+    if (feof(dataFile)) {
+        isDataCorrect = 0;
+    }
+
+    if (fscanf(dataFile, "%d", &testLen) == 1)
+    {
+        if (testLen < 1)
+            isDataCorrect = 0;
+        else
+        {
+            if (*arr == NULL)
+            {
+                *arr = (int *)malloc(testLen * sizeof(int));
+                *len = testLen;
+            }
+            else
+            {
+                reallocSafe(arr, len, &testLen);
+            }
+        }
+    }
+
+    printf(" %b ", isDataCorrect); // !!!
+
+    for (i = 0; (i < *len) && isDataCorrect; ++i)
+    {
+        fscanf(dataFile, "%d", &(*arr)[i]);
+
+        if ((*arr)[i] < MIN_ELEMENT || (*arr)[i] > MAX_ELEMENT)
+            isDataCorrect = 0;
+
+        if (i < *len - 1 && feof(dataFile)) 
+            isDataCorrect = 0;
+    }
+
+    printf(" %b ", isDataCorrect); // !!!
+
+    if (!feof(dataFile)) {
+        isDataCorrect = 0;
+    }
+
+    fclose(dataFile);
+
+    if (!isDataCorrect)
+    {
+        if (arr != NULL && *arr != NULL)
+        {
+            free(*arr);
+            *arr = NULL;
+        }
+        *len = 0;
+        printf("Некорректные данные в указанном файле\n");
+    }
 }
 
 void writeArray(const int *arr, const int n)
 {
     int outputMethod;
+    _Bool isNumbered;
 
     outputMethod = 0;
+    isNumbered = 0;
 
-    if (arr == NULL) 
+    if (arr == NULL)
     {
-        printf("Массив пуст, сначала введите массив через соответствующий пункт меню..\n");    
+        printf("Массив пуст, сначала введите массив через соответствующий пункт меню..\n");
     }
     else
     {
@@ -320,33 +414,51 @@ void writeArray(const int *arr, const int n)
         outputMethod = scanInt(0, 1, "> ");
 
         if (outputMethod == 0)
-            writeArrayIntoConsole(arr, n);
+            writeArrayIntoConsole(arr, n, isNumbered);
         else
             writeArrayIntoFile(arr, n);
     }
 }
 
-void writeArrayIntoConsole(const int *arr, const int n)
+void writeArrayIntoConsole(const int *arr, const int n, _Bool isNumbered)
 {
     int i;
     i = 0;
 
-    if (arr != NULL && n != 0)
+    printf("\nМассив:\n");
+
+    if (isNumbered)
     {
-        for (i = 0; i < n; i++)
+        if (arr != NULL && n != 0)
         {
-            printf("%d ", arr[i]);
+            for (i = 0; i < n; i++)
+            {
+                printf("%d) %d\n", i + 1, arr[i]);
+            }
+            printf("\n");
         }
-        printf("\n");
+        else
+            printf("Ошибка состояния массива.\n");
     }
     else
-        printf("Ошибка состояния массива.\n");
+    {
+        if (arr != NULL && n != 0)
+        {
+            for (i = 0; i < n; i++)
+            {
+                printf("%d ", arr[i]);
+            }
+            printf("\n");
+        }
+        else
+            printf("Ошибка состояния массива.\n");
+    }
 }
 
-void writeArrayIntoFile(const int *arr, const int n)2
+void writeArrayIntoFile(const int *arr, const int n)
 {
-    const int MAX_BUFFER = 255; 
-    
+    const int MAX_BUFFER = 255;
+
     char fPath[MAX_BUFFER];
     _Bool isToRead;
     FILE *dataFile;
@@ -371,31 +483,31 @@ void writeArrayIntoFile(const int *arr, const int n)2
 void changeElement(int **arr, int *n)
 {
     const int MIN_ELEMENT = -1000000;
-    const int MAX_ELEMENT =  1000000;
-    
+    const int MAX_ELEMENT = 1000000;
+
     int newElement, index;
+    _Bool isNumbered;
 
     newElement = 0;
     index = 0;
+    isNumbered = 1;
 
-    if (*arr == NULL) 
+    if (arr == NULL || *arr == NULL)
     {
         printf("Изменение массива невозможно, так как массив пуст. Сначала введите массив через соответствующий пункт меню.\n");
     }
     else
     {
-
-        printf("Введённый массив: ");
-        writeArrayIntoConsole(*arr, *n);
+        writeArrayIntoConsole(*arr, *n, isNumbered);
         printf("Введите индекс элемента, который хотите изменить в диапазоне [1;%d]:\n", *n);
-    
+
         index = scanInt(1, *n, "> ");
-    
-        printf("Вы хотите заменить элемент под номером %d со значением %d на новое значение:\n");
+
+        printf("Вы хотите заменить элемент под номером %d со значением %d на новое значение:\n", index, (*arr)[index]);
         newElement = scanInt(MIN_ELEMENT, MAX_ELEMENT, "> ");
-    
+
         (*arr)[index - 1] = newElement;
-        printf("Элемент успешно изменён.");
+        printf("Элемент успешно изменён.\n");
     }
 }
 
@@ -422,15 +534,15 @@ int partition(int **dataArray, const int arrayLength, int low, int high)
 
     while (isDoNotStop)
     {
-        while ((*dataArray)[i] < pivot) 
+        while ((*dataArray)[i] < pivot)
             i = i + 1;
-        
-        while ((*dataArray)[j] > pivot) 
+
+        while ((*dataArray)[j] > pivot)
             j = j - 1;
 
         if (i >= j)
             isDoNotStop = 0;
-        else    
+        else
             swap(dataArray, i++, j--);
     }
 
@@ -444,13 +556,12 @@ void quicksort(int **dataArray, const int arrayLength, int low, int high)
 
     if (*dataArray == NULL)
         printf("Массив пуст, сначала введите массив через соответствующий пункт меню.\n");
-    else
-        if (low < high)
-        {
-            point = partition(dataArray, arrayLength, low, high);
-            quicksort(&(*dataArray), arrayLength, low, point);
-            quicksort(&(*dataArray), arrayLength, point + 1, high);
-        }
+    else if (low < high)
+    {
+        point = partition(dataArray, arrayLength, low, high);
+        quicksort(&(*dataArray), arrayLength, low, point);
+        quicksort(&(*dataArray), arrayLength, point + 1, high);
+    }
 }
 
 void menuStage(int **dataArray, int *arrayLength)
@@ -477,33 +588,53 @@ void menuStage(int **dataArray, int *arrayLength)
             printf("\n====== Метод ввода ======\n");
             fillArray(&*dataArray, &*arrayLength);
         }
+        else if (menuOption == 2)
+        {
+            printf("\n====== Сортировка ======\n");
+            quicksort(&*dataArray, *arrayLength, 0, *arrayLength - 1);
+            if (dataArray != NULL)
+                printf("Сортировка произведена\n");
+        }
+        else if (menuOption == 3)
+        {
+            printf("\n====== Вывод массива ======\n");
+            writeArray(*dataArray, *arrayLength);
+        }
+        else if (menuOption == 4)
+        {
+            printf("\n====== Изменение элемента ======\n");
+            changeElement(&*dataArray, &*arrayLength);
+        }
+        else if (menuOption == 5)
+        {
+            printf("\n====== Помощь ======\n");
+            writeHelp();
+        }
         else 
-            if (menuOption == 2)  
-            {
-                printf("\n====== Сортировка ======\n");
-                quicksort(&*dataArray, *arrayLength, 0, *arrayLength - 1);
-            }
-            else 
-                if (menuOption == 3)
-                {
-                    printf("\n====== Вывод массива ======\n");
-                    writeArray(*dataArray, *arrayLength);  
-                }
-                else 
-                    if (menuOption == 4)
-                    {
-                        printf("\n====== Изменение элемента ======\n");
-                        changeElement(&*dataArray, &*arrayLength); 
-                    }
-                    else 
-                        if (menuOption == 5)
-                        {
-                            printf("\n====== Помощь ======\n");
-                            writeHelp(); 
-                        }
-                        else
-                            if (menuOption == 0)
-                                isDoNotStop = 0;
+        if (menuOption == 0)
+        {
+            isDoNotStop = 0;
+            printf("\n====== Выход ======\n");
+        }
 
     } while (isDoNotStop);
+}
+
+void freeArray(int **arr, int *len)
+{
+    if (!(arr == NULL || *arr == NULL))
+    {
+        free(*arr);
+        *arr = NULL;
+        *len = 0;
+    }
+}
+
+void freeSafeOneRef(int *data)
+{
+    if (data != NULL)
+    {
+        free(data);
+        data = NULL;    
+    }
 }
