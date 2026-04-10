@@ -5,7 +5,7 @@
 begin:
     MOV AX, @data
     MOV DS, AX
-
+   
     MOV AH, 9
     MOV DX, OFFSET Msg
     INT 21h  
@@ -18,7 +18,6 @@ begin:
     INT 21h
 
 .data
-    Msg  DB 'Hello, World!!!$'
+    Msg  DB 'Hello', 0DH, 0AH, 'World!$'
     
 END begin
-end start

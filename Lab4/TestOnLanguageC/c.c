@@ -41,6 +41,7 @@ void quicksort(int **dataArray, const int arrayLength, int low, int high);
 
 void reallocSafe(int **destination, int *destLen, int *newLen);
 void freeSafeOneRef(int *data);
+void freeSafeTwoRef(int **data);
 void freeArray(int **arr, int *len);
 
 int main(void)
@@ -385,8 +386,7 @@ void fillArrayFromFile(int **arr, int *len)
     {
         if (arr != NULL && *arr != NULL)
         {
-            free(*arr);
-            *arr = NULL;
+            freeSafeTwoRef(arr);
         }
         *len = 0;
         printf("Некорректные данные в указанном файле\n");
@@ -637,4 +637,13 @@ void freeSafeOneRef(int *data)
         free(data);
         data = NULL;    
     }
+}
+
+void freeSafeTwoRef(int **data)
+{
+    if (data != NULL && *data != NULL)
+    {
+        free(*data);
+        *data = NULL;    
+    }   
 }
