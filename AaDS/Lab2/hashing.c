@@ -56,9 +56,7 @@ int scanInt(const int MIN_NUMBER, const int MAX_NUMBER, const char myString[])
     return number;
 }
 
-// ==================== HELPER FUNCTIONS ====================
-
-// Read string input
+//* Read string 
 void readString(const char* prompt, char* buffer, int bufferSize) 
 {
     printf("%s", prompt);
@@ -70,7 +68,9 @@ void readString(const char* prompt, char* buffer, int bufferSize)
 struct library* createItem(enum hierarchyLevel level, int page, const char* data) 
 {
     struct library* item = (struct library*)calloc(1, sizeof(struct library));
-    if (!item) return NULL;
+    
+    if (!item) 
+        return NULL;
     
     item->hLevel = level;
     item->pageNumber = page;
@@ -80,7 +80,7 @@ struct library* createItem(enum hierarchyLevel level, int page, const char* data
     return item;
 }
 
-// Add child to the end of children list
+// Add child
 void addChildToEnd(struct library* parent, struct library* child) 
 {
     if (!parent || !child) return;
@@ -101,7 +101,7 @@ void addChildToEnd(struct library* parent, struct library* child)
     child->prev = last;
 }
 
-// Add term to the end of root list
+// Add term
 void addTermToEnd(struct library** termList, struct library* term) 
 {
     if (!term) return;
@@ -120,7 +120,7 @@ void addTermToEnd(struct library** termList, struct library* term)
     term->prev = last;
 }
 
-// Recursive delete of item and all its descendants
+// Recursive delete
 void deleteItemRecursive(struct library** termList, struct library* item) 
 {
     if (!item) return;
@@ -135,7 +135,8 @@ void deleteItemRecursive(struct library** termList, struct library* item)
     
     // If item has a parent
     if (item->parent) {
-        // Remove item from parent's children list
+        //// Remove item from parent's children list
+        // Удаляем элемент item из родителей
         struct library* current = item->parent->firstChild;
         
         // If deleting first child
@@ -176,9 +177,9 @@ void deleteItemRecursive(struct library** termList, struct library* item)
     free(item);
 }
 
-// ==================== SEARCH ====================
+// поисковые функции
 
-// Find term by name (root level only)
+// Find term by name
 struct library* findTermByName(struct library* termList, const char* name) 
 {
     struct library* curr = termList;
@@ -191,24 +192,31 @@ struct library* findTermByName(struct library* termList, const char* name)
     return NULL;
 }
 
-// ==================== 1) VIEW ====================
+// вывод всей библиотеки
 
 // Recursive tree printing
 void printTree(struct library* item, int indent) 
 {
-    if (!item) return;
+    if (!item) 
+        return;
     
-    for (int i = 0; i < indent; i++) {
+    for (int i = 0; i < indent; ++i) 
+    {
         printf("  ");
     }
     
     if (item->hLevel == lvlTerm) {
-        printf("[TERM] %s (p. %d)\n", item->termData, item->pageNumber);
-    } else if (item->hLevel == lvlSubterm) {
-        printf("  [SUBTERM] %s (p. %d)\n", item->termData, item->pageNumber);
-    } else {
-        printf("    [SUBSUBTERM] %s (p. %d)\n", item->termData, item->pageNumber);
-    }
+        printf("[Term] %s (page %d)\n", item->termData, item->pageNumber);
+    } 
+    else 
+        if (item->hLevel == lvlSubterm) 
+        {
+            printf("  [Subterm] %s (page %d)\n", item->termData, item->pageNumber);
+        } 
+        else 
+        {
+            printf("    [Subsubterm] %s (page %d)\n", item->termData, item->pageNumber);
+        }
     
     printTree(item->firstChild, indent + 1);
     printTree(item->next, indent);
@@ -216,19 +224,20 @@ void printTree(struct library* item, int indent)
 
 void viewAll(struct library* termList) 
 {
-    printf("\n========== FULL HIERARCHY ==========\n");
-    if (!termList) {
-        printf("(empty)\n");
-    } else {
+    printf("\n====== Hierarchy ======\n");
+    if (!termList) 
+    {
+        printf("List is empty\n");
+    } 
+    else 
+    {
         printTree(termList, 0);
     }
-    printf("====================================\n");
+    printf("\n");
 }
 
-// ==================== FUNCTION FOR NUMBERED LIST (FOR DELETE) ====================
-
 // Recursively collect all items into array with numbers
-void collectAllItems(struct library* item, struct library** array, int* index, int* nextNumber) 
+void collectAllItems(struct library* item, struct library** array, int* index, int* nextNumber, _Bool isPrintNeeded) 
 {
     if (!item) return;
     
@@ -246,22 +255,22 @@ void collectAllItems(struct library* item, struct library** array, int* index, i
         prefix = "    SUBSUBTERM";
     }
     
-    printf("%d. %s: %s (p. %d)\n", *nextNumber, prefix, item->termData, item->pageNumber);
+    if (isPrintNeeded)
+        printf("%d. %s: %s (p. %d)\n", *nextNumber, prefix, item->termData, item->pageNumber);
+
     (*nextNumber)++;
     
-    // recursively traverse children
-    collectAllItems(item->firstChild, array, index, nextNumber);
+    // recursively find children
+    collectAllItems(item->firstChild, array, index, nextNumber, isPrintNeeded);
     
-    // traverse next item at same level
-    collectAllItems(item->next, array, index, nextNumber);
+    // recursively find next item
+    collectAllItems(item->next, array, index, nextNumber, isPrintNeeded);
 }
-
-// ==================== 2) DELETE BY NUMBER ====================
 
 void deleteItem(struct library** termList) 
 {
     if (!*termList) {
-        printf("No items to delete!\n");
+        printf("No items to delete\n");
         return;
     }
     
@@ -270,16 +279,17 @@ void deleteItem(struct library** termList)
     struct library** tempArray = (struct library**)malloc(1000 * sizeof(struct library*));
     int tempIndex = 0;
     int tempNumber = 1;
-    collectAllItems(*termList, tempArray, &tempIndex, &tempNumber);
+
+    collectAllItems(*termList, tempArray, &tempIndex, &tempNumber, 0);
     totalCount = tempIndex;
     free(tempArray);
     
     if (totalCount == 0) {
-        printf("No items to delete!\n");
+        printf("No items to delete\n");
         return;
     }
     
-    printf("\n--- DELETE ITEM ---\n");
+    printf("\n====== Delete item ======\n");
     printf("Available items for deletion:\n");
     
     // Create array of pointers to all items
@@ -288,11 +298,9 @@ void deleteItem(struct library** termList)
     int number = 1;
     
     // Fill array and print numbered list
-    collectAllItems(*termList, allItems, &index, &number);
-    
+    collectAllItems(*termList, allItems, &index, &number, 1);   
     printf("\n");
-    
-    // Choose item number to delete
+
     int choice = scanInt(1, totalCount, "Enter item number to delete: ");
     
     // Get selected item
@@ -301,16 +309,15 @@ void deleteItem(struct library** termList)
     // Save name for message
     char deletedName[256];
     strcpy(deletedName, toDelete->termData);
-    
-    // Delete item
+
     deleteItemRecursive(termList, toDelete);
     
-    printf("Item '%s' and all its sub-items deleted!\n", deletedName);
+    printf("Item '%s' and all its sub-items deleted\n", deletedName);
     
     free(allItems);
 }
 
-// ==================== 2) ADD ====================
+// adding element
 
 void addNewTerm(struct library** termList) 
 {
@@ -421,12 +428,15 @@ void addNewSubSubterm(struct library* termList)
 
 void addItem(struct library** termList) 
 {
-    int choice = scanInt(1, 3, "\n--- ADD ---\n1. Add term\n2. Add subterm\n3. Add subsubterm\n> ");
+    int choice = scanInt(1, 3, "\n====== Add ======\n1. Add term\n2. Add subterm\n3. Add subsubterm\n> ");
     
     switch(choice) {
-        case 1: addNewTerm(termList); break;
-        case 2: addNewSubterm(*termList); break;
-        case 3: addNewSubSubterm(*termList); break;
+        case 1: addNewTerm(termList); 
+            break;
+        case 2: addNewSubterm(*termList); 
+            break;
+        case 3: addNewSubSubterm(*termList); 
+            break;
     }
 }
 
@@ -458,7 +468,7 @@ void editItem(struct library* termList)
     printf("Current page: %d\n", term->pageNumber);
     
     char newName[256];
-    printf("New name (Enter to keep): ");
+    printf("New name: ");
     fgets(newName, sizeof(newName), stdin);
     newName[strcspn(newName, "\n")] = '\0';
     if (strlen(newName) > 0) {
@@ -537,7 +547,7 @@ void sortItems(struct library** termList)
         return;
     }
     
-    int choice = scanInt(1, 2, "\n--- SORT ---\n1. By name (all levels)\n2. By page number (all levels)\n> ");
+    int choice = scanInt(1, 2, "\n====== Sorting ======\n1. By name\n2. By page number\n> ");
     
     if (choice == 1) {
         sortLevelRecursive(termList, compareByName);
@@ -593,7 +603,7 @@ void searchTermsBySubterm(struct library* termList)
 {
     char subName[256];
     
-    readString("\n--- SEARCH TERMS BY SUBTERM ---\nEnter subterm name: ", subName, sizeof(subName));
+    readString("\n====== Search term by subterm ======\nEnter subterm name: ", subName, sizeof(subName));
     
     printf("\nTerms containing subterm \"%s\":\n", subName);
     
@@ -621,18 +631,16 @@ void searchTermsBySubterm(struct library* termList)
 
 void showMenu() 
 {
-    printf("\n====================================\n");
-    printf("             MAIN MENU              \n");
-    printf("====================================\n");
+    printf("====== Main menu ======\n");
     printf("1. View full hierarchy\n");
     printf("2. Add item\n");
-    printf("3. Delete item (by number)\n");
+    printf("3. Delete item\n");
     printf("4. Edit term\n");
-    printf("5. Sort (all levels)\n");
+    printf("5. Sort\n");
     printf("6. Search subterms by term\n");
     printf("7. Search terms by subterm\n");
     printf("0. Exit\n");
-    printf("====================================\n");
+    printf("=======================\n");
 }
 
 int main(void) 
@@ -642,7 +650,7 @@ int main(void)
     struct library* termList = NULL;
     
     // ===== DEMONSTRATION DATA =====
-    printf("\nCREATING DEMONSTRATION DATA...\n");
+    printf("\nDemonstration:\n");
     
     struct library* t1 = createItem(lvlTerm, 10, "Programming");
     struct library* t2 = createItem(lvlTerm, 25, "Databases");
@@ -705,11 +713,12 @@ int main(void)
     struct library* s11 = createItem(lvlSubterm, 17, "OSI Model");
     addChildToEnd(t4, s10);
     addChildToEnd(t4, s11);
+
+    struct library* s12 = createItem(lvlSubterm, 150, "Relational");
+    addChildToEnd(t4, s12); 
     
-    printf("Demonstration data created!\n");
     viewAll(termList);
     
-    // ===== MAIN LOOP =====
     int choice;
     do {
         showMenu();
@@ -725,6 +734,7 @@ int main(void)
             case 7: searchTermsBySubterm(termList); break;
             case 0: printf("\n=== Exiting ===\n"); break;
         }
+
     } while (choice != 0);
     
     while (termList) {
