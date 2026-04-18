@@ -437,10 +437,8 @@ void addItem(struct library** termList)
             break;
         case 3: addNewSubSubterm(*termList); 
             break;
+        }
     }
-}
-
-// ==================== 2) EDIT ====================
 
 void editItem(struct library* termList) 
 {
@@ -482,8 +480,6 @@ void editItem(struct library* termList)
     
     printf("Term updated!\n");
 }
-
-// ==================== 3) SORT ====================
 
 int compareByName(const void* a, const void* b) 
 {
@@ -560,8 +556,6 @@ void sortItems(struct library** termList)
     viewAll(*termList);
 }
 
-// ==================== 4) SEARCH ====================
-
 void searchSubtermsByTerm(struct library* termList) 
 {
     if (!termList) {
@@ -595,6 +589,8 @@ void searchSubtermsByTerm(struct library* termList)
         }
         child = child->next;
     }
+
+    printf("\n");
     
     if (!found) printf("  (no subterms)\n");
 }
@@ -627,11 +623,9 @@ void searchTermsBySubterm(struct library* termList)
     if (!found) printf("  (not found)\n");
 }
 
-// ==================== MAIN MENU ====================
-
 void showMenu() 
 {
-    printf("====== Main menu ======\n");
+    printf("====== Library ======\n");
     printf("1. View full hierarchy\n");
     printf("2. Add item\n");
     printf("3. Delete item\n");
@@ -645,13 +639,14 @@ void showMenu()
 
 int main(void) 
 {
+    //0
     setlocale(LC_ALL, "C");
     
     struct library* termList = NULL;
     
-    // ===== DEMONSTRATION DATA =====
-    printf("\nDemonstration:\n");
+    printf("\nBase library:\n");
     
+    // Добавление
     struct library* t1 = createItem(lvlTerm, 10, "Programming");
     struct library* t2 = createItem(lvlTerm, 25, "Databases");
     struct library* t3 = createItem(lvlTerm, 5, "Algorithms");
@@ -682,19 +677,20 @@ int main(void)
     addChildToEnd(s2, ss4); 
     addChildToEnd(s2, ss5);
     addChildToEnd(s2, ss6);
-    
     struct library* s4 = createItem(lvlSubterm, 30, "Relational");
     struct library* s5 = createItem(lvlSubterm, 28, "NoSQL");
+
     struct library* s6 = createItem(lvlSubterm, 30, "Relational");
     addChildToEnd(t2, s4); 
     addChildToEnd(t2, s5);
     addChildToEnd(t2, s6);
     
     struct library* ss7 = createItem(lvlSubsubterm, 31, "MySQL");
+
+
     struct library* ss8 = createItem(lvlSubsubterm, 32, "PostgreSQL");
     addChildToEnd(s4, ss7);
     addChildToEnd(s4, ss8);
-    
     struct library* s7 = createItem(lvlSubterm, 6, "Sorting");
     struct library* s8 = createItem(lvlSubterm, 7, "Searching");
     struct library* s9 = createItem(lvlSubterm, 9, "Graphs");
@@ -712,6 +708,9 @@ int main(void)
     struct library* s10 = createItem(lvlSubterm, 16, "Protocols");
     struct library* s11 = createItem(lvlSubterm, 17, "OSI Model");
     addChildToEnd(t4, s10);
+
+
+
     addChildToEnd(t4, s11);
 
     struct library* s12 = createItem(lvlSubterm, 150, "Relational");

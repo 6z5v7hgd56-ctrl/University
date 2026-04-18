@@ -1,8 +1,8 @@
 .stack 100h
 
 .data
-    str     db "hello world programming in assembler is fun", 0Dh, 0Ah, '$'
-    buffer  db 200 dup(?)
+    str     db "hello world programming in assembler is very hard", 0Dh, 0Ah, '$'
+    ;buffer  db 200 dup(?)
     words   dw 50 dup(0)   
     lengths dw 50 dup(0)   
     count   dw 0           
@@ -13,13 +13,17 @@
 start:
     MOV AX, @data
     MOV DS, AX
-    MOV ES, AX
-
-    LEA SI, str
-    LEA DI, words
+    ;MOV ES, AX
+    
+    ;MOV SI, OFFSET str
+    LEA SI, str 
+    ;MOV DI, OFFSET words
+    LEA DI, words 
+    ;MOV BX OFFSET lengths
     LEA BX, lengths
     MOV word ptr count, 0
-
+  
+  ;Find first symphol of new word
 find_words:
     MOV AL, [si]
     CMP AL, '$'
@@ -36,7 +40,7 @@ is_word_start:
     MOV [DI], SI  
     ADD DI, 2
 
-    XOR CX, CX  
+    XOR CX, CX ; Cx now equals 0  
     
 count_length:
     MOV AL, [SI]
@@ -92,7 +96,7 @@ no_swap:
     POP CX
     LOOP bubble_outer
 
-    MOV AX, 9
+    MOV AH, 9
     LEA DX, msg
     INT 21h
 
@@ -126,11 +130,11 @@ print_space:
     MOV DL, ' '
     INT 21h
 
-    ADD si, 2
-    POP cx
+    ADD SI, 2
+    POP CX
     LOOP print_loop
 
-    MOV ah, 4Ch
+    MOV AH, 4Ch
     INT 21h
 
 end start
