@@ -21,7 +21,7 @@ struct library
     enum hierarchyLevel hLevel;
     int pageNumber;
     char termData[256];
-};
+};     
 
 int scanInt(const int MIN_NUMBER, const int MAX_NUMBER, const char myString[])
 {
