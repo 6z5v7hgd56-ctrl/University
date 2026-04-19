@@ -13,9 +13,16 @@ int* generateNearlySortedArray(size_t length);
 int* generateLowVarianceArray(size_t length);
 
 void printTableOnNonuniformGeneratedArray(int* arr, int length);
+void printTableOnArrayWithUniformRepetitions(int* arr, int length);
+void printTableOnAlternatingSeriesArray(int* arr, int length);
+void printTableOnNearlySortedArray(int* arr, int length);
+void printTableOnLowVarianceArray(int* arr, int length);
 
 int scanInt(const int MIN_NUMBER, const int MAX_NUMBER, const char myString[]);
 void writeArray(const int *arr, const size_t n);
+void swap(int *arr, int i, int j);
+
+void printAnalysis();
 
 // 20 массив из случайных чисел с неравномерным распределением
 // 31 массив с равномерно распределёнными повторениями
@@ -45,8 +52,12 @@ int main(void) // Вариант 20
     genArrLVA = generateLowVarianceArray(length);
 
     printTableOnNonuniformGeneratedArray(genArrNRA, length);
+    printTableOnArrayWithUniformRepetitions(genArrAWUR, length);
+    printTableOnAlternatingSeriesArray(genArrASA, length);
+    printTableOnNearlySortedArray(genArrNSA, length);
+    printTableOnLowVarianceArray(genArrLVA, length);
 
-
+    printAnalysis();
 
     free(genArrNRA);
     free(genArrAWUR);
@@ -54,6 +65,11 @@ int main(void) // Вариант 20
     free(genArrNSA);
     free(genArrLVA);
     return 0;
+}
+
+void printAnalysis()
+{
+    printf("Вывод: в среднем, лучшей сортировкой можно считать");
 }
 
 void printTableOnNonuniformGeneratedArray(int* arr, int length)
@@ -67,18 +83,198 @@ void printTableOnNonuniformGeneratedArray(int* arr, int length)
 
     printf("Не отсортированный массив из случайных чисел с неравномерным распределением:\n");
     writeArray(arr, length);
+    
+    sorted = bubbleSort(arr, length, &compCount, &swapCount);
     printf("\nПосле сортировки:\n");
     writeArray(sorted, length);
     printf("\n");
 
-    sorted = bubbleSort(arr, length, &compCount, &swapCount);
-
-    printf("___________________________________________________________\n");
-    printf("| Размер |   Алгоритм   | Число сравнений | Число обменов |\n");
-    printf("|---------------------------------------------------------|\n");
-    printf("| %6d | Bobble sort  | %-14d | %-14d |\n", length, compCount, swapCount);
+    printf("/=_Массив из случайных чисел с неравномерным распределением_=\\\n");
+    printf("|____________________________________________________________|\n");
+    printf("| Размер |    Алгоритм    | Число сравнений | Число обменов  |\n");
+    printf("|------------------------------------------------------------|\n");
+    printf("| %6d | Bobble sort    | %-15d | %-14d |\n", length, compCount, swapCount);
     
+    compCount = 0;
+    swapCount = 0;
 
+    sorted = insertionSort(arr, length, &compCount, &swapCount);
+
+    printf("|--------|----------------|-----------------|----------------|\n");
+    printf("| %6d | Insertion sort | %-15d | %-14d |\n", length, compCount, swapCount);
+
+    compCount = 0;
+    swapCount = 0;
+
+    sorted = selectionSort(arr, length, &compCount, &swapCount);
+
+    printf("|--------|----------------|-----------------|----------------|\n");
+    printf("| %6d | Selection sort | %-15d | %-14d |\n", length, compCount, swapCount);
+    printf("\\------------------------------------------------------------/\n\n\n");
+}
+
+void printTableOnArrayWithUniformRepetitions(int* arr, int length)
+{
+    long long compCount, swapCount;
+    int *sorted;
+    int i;
+
+    compCount = 0;
+    swapCount = 0;
+
+    printf("Не отсортированный массив с равномерно распределёнными повторениями:\n");
+    writeArray(arr, length);
+    
+    sorted = bubbleSort(arr, length, &compCount, &swapCount);
+    printf("\nПосле сортировки:\n");
+    writeArray(sorted, length);
+    printf("\n");
+
+    printf("/=_____Массив с равномерно распределёнными повторениями_____=\\\n");
+    printf("|____________________________________________________________|\n");
+    printf("| Размер |    Алгоритм    | Число сравнений | Число обменов  |\n");
+    printf("|------------------------------------------------------------|\n");
+    printf("| %6d | Bobble sort    | %-15d | %-14d |\n", length, compCount, swapCount);
+    
+    compCount = 0;
+    swapCount = 0;
+
+    sorted = insertionSort(arr, length, &compCount, &swapCount);
+
+    printf("|--------|----------------|-----------------|----------------|\n");
+    printf("| %6d | Insertion sort | %-15d | %-14d |\n", length, compCount, swapCount);
+
+    compCount = 0;
+    swapCount = 0;
+
+    sorted = selectionSort(arr, length, &compCount, &swapCount);
+
+    printf("|--------|----------------|-----------------|----------------|\n");
+    printf("| %6d | Selection sort | %-15d | %-14d |\n", length, compCount, swapCount);
+    printf("\\------------------------------------------------------------/\n\n\n");
+}
+
+void printTableOnAlternatingSeriesArray(int* arr, int length)
+{
+    long long compCount, swapCount;
+    int *sorted;
+    int i;
+
+    compCount = 0;
+    swapCount = 0;
+
+    printf("Не отсортированный массив с чередующимися возрастающими и убывающими сериями:\n");
+    writeArray(arr, length);
+    
+    sorted = bubbleSort(arr, length, &compCount, &swapCount);
+    printf("\nПосле сортировки:\n");
+    writeArray(sorted, length);
+    printf("\n");
+
+    printf("/=_Массив с чередующимися возрастающими и убывающими сериями_=\\\n");
+    printf("|_____________________________________________________________|\n");
+    printf("| Размер |    Алгоритм    | Число сравнений |  Число обменов  |\n");
+    printf("|-------------------------------------------------------------|\n");
+    printf("| %6d | Bobble sort    | %-15d | %-15d |\n", length, compCount, swapCount);
+    
+    compCount = 0;
+    swapCount = 0;
+
+    sorted = insertionSort(arr, length, &compCount, &swapCount);
+
+    printf("|--------|----------------|-----------------|-----------------|\n");
+    printf("| %6d | Insertion sort | %-15d | %-15d |\n", length, compCount, swapCount);
+
+    compCount = 0;
+    swapCount = 0;
+
+    sorted = selectionSort(arr, length, &compCount, &swapCount);
+
+    printf("|--------|----------------|-----------------|-----------------|\n");
+    printf("| %6d | Selection sort | %-15d | %-15d |\n", length, compCount, swapCount);
+    printf("\\-------------------------------------------------------------/\n\n\n");
+}
+
+void printTableOnNearlySortedArray(int* arr, int length)
+{
+    long long compCount, swapCount;
+    int *sorted;
+    int i;
+
+    compCount = 0;
+    swapCount = 0;
+
+    printf("Почти отсортированный массив:\n");
+    writeArray(arr, length);
+    
+    sorted = bubbleSort(arr, length, &compCount, &swapCount);
+    printf("\nПосле сортировки:\n");
+    writeArray(sorted, length);
+    printf("\n");
+
+    printf("/=________________Почти отсортированный массив_______________=\\\n");
+    printf("|_____________________________________________________________|\n");
+    printf("| Размер |    Алгоритм    | Число сравнений |  Число обменов  |\n");
+    printf("|-------------------------------------------------------------|\n");
+    printf("| %6d | Bobble sort    | %-15d | %-15d |\n", length, compCount, swapCount);
+    
+    compCount = 0;
+    swapCount = 0;
+
+    sorted = insertionSort(arr, length, &compCount, &swapCount);
+
+    printf("|--------|----------------|-----------------|-----------------|\n");
+    printf("| %6d | Insertion sort | %-15d | %-15d |\n", length, compCount, swapCount);
+
+    compCount = 0;
+    swapCount = 0;
+
+    sorted = selectionSort(arr, length, &compCount, &swapCount);
+
+    printf("|--------|----------------|-----------------|-----------------|\n");
+    printf("| %6d | Selection sort | %-15d | %-15d |\n", length, compCount, swapCount);
+    printf("\\-------------------------------------------------------------/\n\n\n");
+}
+
+void printTableOnLowVarianceArray(int* arr, int length)
+{
+    long long compCount, swapCount;
+    int *sorted;
+    int i;
+
+    compCount = 0;
+    swapCount = 0;
+
+    printf("Не отсортированный массив, где каждый следующий элемент отличается на небольшую величину:\n");
+    writeArray(arr, length);
+    
+    sorted = bubbleSort(arr, length, &compCount, &swapCount);
+    printf("\nПосле сортировки:\n");
+    writeArray(sorted, length);
+    printf("\n");
+
+    printf("/=Массив, где следующий элемент немного отлич. от предыдущего=\\\n");
+    printf("|_____________________________________________________________|\n");
+    printf("| Размер |    Алгоритм    | Число сравнений |  Число обменов  |\n");
+    printf("|-------------------------------------------------------------|\n");
+    printf("| %6d | Bobble sort    | %-15d | %-15d |\n", length, compCount, swapCount);
+    
+    compCount = 0;
+    swapCount = 0;
+
+    sorted = insertionSort(arr, length, &compCount, &swapCount);
+
+    printf("|--------|----------------|-----------------|-----------------|\n");
+    printf("| %6d | Insertion sort | %-15d | %-15d |\n", length, compCount, swapCount);
+
+    compCount = 0;
+    swapCount = 0;
+
+    sorted = selectionSort(arr, length, &compCount, &swapCount);
+
+    printf("|--------|----------------|-----------------|-----------------|\n");
+    printf("| %6d | Selection sort | %-15d | %-15d |\n", length, compCount, swapCount);
+    printf("\\-------------------------------------------------------------/\n\n\n");
 }
 
 int scanInt(const int MIN_NUMBER, const int MAX_NUMBER, const char myString[])
@@ -106,7 +302,7 @@ int scanInt(const int MIN_NUMBER, const int MAX_NUMBER, const char myString[])
         if (!isIncorrect && ((number < MIN_NUMBER) || (number > MAX_NUMBER)))
         {
             isIncorrect = 1;
-            printf("Число должно сходить в диапазон [%d,%d]\n", MIN_NUMBER, MAX_NUMBER);
+            printf("Число должно входить в диапазон [%d,%d]\n", MIN_NUMBER, MAX_NUMBER);
         }
 
     } while (isIncorrect);
@@ -263,7 +459,7 @@ int* generateNearlySortedArray(size_t length)
         // temp = arr[idx1];
         // arr[idx1] = arr[idx2];
         // arr[idx2] = temp;
-        swap(&arr, idx1, idx2);
+        swap(arr, idx1, idx2);
     }
 
     return arr;

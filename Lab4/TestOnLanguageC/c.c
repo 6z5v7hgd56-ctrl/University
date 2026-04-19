@@ -108,7 +108,7 @@ int scanInt(const int MIN_NUMBER, const int MAX_NUMBER, const char myString[])
         if (!isIncorrect && ((number < MIN_NUMBER) || (number > MAX_NUMBER)))
         {
             isIncorrect = 1;
-            printf("Число должно сходить в диапазон [%d,%d]\n", MIN_NUMBER, MAX_NUMBER);
+            printf("Число должно входить в диапазон [%d,%d]\n", MIN_NUMBER, MAX_NUMBER);
         }
 
     } while (isIncorrect);

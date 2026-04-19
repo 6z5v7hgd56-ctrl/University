@@ -18,13 +18,14 @@
 //     (*dataArray)[i] = (*dataArray)[i] - (*dataArray)[j];
 // }
 
-void swap(int *arr, int i, int j) 
+void swap(int *arr, int i, int j)
 {
     int temp;
     temp = arr[i];
     arr[i] = arr[j];
     arr[j] = temp;
 }
+
 
 int* selectionSort(int *unsortedArray, size_t length, long long *comparisonCount, long long *swapCount) 
 {
@@ -88,10 +89,9 @@ int* insertionSort(int *unsortedArray, size_t length, long long *comparisonCount
             (*swapCount)++;
             (*comparisonCount)++; // ???
         }
-        if (j >= 0)
-            (*comparisonCount)++;
 
-            sortedArray[j + 1] = key;
+        (*comparisonCount)++;
+        sortedArray[j + 1] = key;
     }
 
     return sortedArray;
@@ -118,7 +118,7 @@ int* bubbleSort(int *unsortedArray, size_t length, long long *comparisonCount, l
         {
             if (sortedArray[i - 1] > sortedArray[i])
             {
-                swap(&sortedArray, i - 1, i);
+                swap(sortedArray, i - 1, i);
                 isSwapped = 1;
                 (*swapCount)++;
             }
