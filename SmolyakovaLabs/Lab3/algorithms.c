@@ -1,5 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
+#include <string.h>
 #include "algorithms.h"
 //#include <time.h>
 
@@ -9,16 +11,31 @@
 //     long long swaps;
 // };
 
-void swap(int **dataArray, int i, int j)
+// void swap(int **dataArray, int i, int j)
+// {
+//     (*dataArray)[i] = (*dataArray)[i] + (*dataArray)[j];
+//     (*dataArray)[j] = (*dataArray)[i] - (*dataArray)[j];
+//     (*dataArray)[i] = (*dataArray)[i] - (*dataArray)[j];
+// }
+
+void swap(int *arr, int i, int j) 
 {
-    (*dataArray)[i] = (*dataArray)[i] + (*dataArray)[j];
-    (*dataArray)[j] = (*dataArray)[i] - (*dataArray)[j];
-    (*dataArray)[i] = (*dataArray)[i] - (*dataArray)[j];
+    int temp;
+    temp = arr[i];
+    arr[i] = arr[j];
+    arr[j] = temp;
 }
 
-int* selectionSort(int *arr, size_t length, long long *comparisonCount, long long *swapCount) 
+int* selectionSort(int *unsortedArray, size_t length, long long *comparisonCount, long long *swapCount) 
 {
-    int j, i;
+    int j, i, temp;
+    int *sortedArray;
+
+    temp = 0;
+
+    sortedArray = (int*)malloc(length * sizeof(int));
+
+    memcpy(sortedArray, unsortedArray, length * sizeof(int));
 
     *comparisonCount = 0ll;
     *swapCount = 0ll;
@@ -30,26 +47,30 @@ int* selectionSort(int *arr, size_t length, long long *comparisonCount, long lon
         
         for (j = i + 1; j < length; ++j) 
         {
-            if (arr[j] < arr[min_idx]) 
+            if (sortedArray[j] < sortedArray[min_idx]) 
             {
                 min_idx = j;
             }
             (*comparisonCount)++;
         }
         
-        int temp = arr[i];
-        arr[i] = arr[min_idx];
-        arr[min_idx] = temp;
+        temp = sortedArray[i];
+        sortedArray[i] = sortedArray[min_idx];
+        sortedArray[min_idx] = temp;
         (*swapCount)++;
     }
 
-    return arr;
+    return sortedArray;
 }
 
-int* insertionSort(int *arr, size_t length, long long *comparisonCount, long long *swapCount) 
+int* insertionSort(int *unsortedArray, size_t length, long long *comparisonCount, long long *swapCount) 
 {
-
     int key, i, j;
+    int *sortedArray;
+
+    sortedArray = (int*)malloc(length * sizeof(int));
+
+    memcpy(sortedArray, unsortedArray, length * sizeof(int));
 
     *comparisonCount = 0ll;
     *swapCount = 0ll;
@@ -57,12 +78,12 @@ int* insertionSort(int *arr, size_t length, long long *comparisonCount, long lon
 
     for (i = 1; i < length; i++) 
     {
-        key = arr[i]; 
+        key = sortedArray[i]; 
         j = i - 1;
 
-        while (j >= 0 && arr[j] > key) 
+        while (j >= 0 && sortedArray[j] > key) 
         {
-            arr[j + 1] = arr[j];
+            sortedArray[j + 1] = sortedArray[j];
             j--;
             (*swapCount)++;
             (*comparisonCount)++; // ???
@@ -70,16 +91,21 @@ int* insertionSort(int *arr, size_t length, long long *comparisonCount, long lon
         if (j >= 0)
             (*comparisonCount)++;
 
-        arr[j + 1] = key;
+            sortedArray[j + 1] = key;
     }
 
-    return arr;
+    return sortedArray;
 }
 
 int* bubbleSort(int *unsortedArray, size_t length, long long *comparisonCount, long long *swapCount)
 {
     _Bool isSwapped;
     int i;
+    int *sortedArray;
+
+    sortedArray = (int*)malloc(length * sizeof(int));
+
+    memcpy(sortedArray, unsortedArray, length * sizeof(int));
 
     isSwapped = 0;
     *comparisonCount = 0ll;
@@ -90,9 +116,9 @@ int* bubbleSort(int *unsortedArray, size_t length, long long *comparisonCount, l
         isSwapped = 0;
         for (i = 1; i < length; ++i)
         {
-            if (unsortedArray[i - 1] > unsortedArray[i])
+            if (sortedArray[i - 1] > sortedArray[i])
             {
-                swap(&unsortedArray, i - 1, i);
+                swap(&sortedArray, i - 1, i);
                 isSwapped = 1;
                 (*swapCount)++;
             }
@@ -101,44 +127,6 @@ int* bubbleSort(int *unsortedArray, size_t length, long long *comparisonCount, l
 
     } while (isSwapped);
     
-    return unsortedArray; 
+    return sortedArray; 
 }
 
-int* generateNonuniformRandomArray(size_t length)
-{
-    const int MAX_ELEMENT = 10000;
-    int i;
-    int *arr;
-
-    arr = (int*)malloc(length * sizeof(int));
-
-    for (i = 0; i < length; ++i)
-    {
-        arr[i] = rand() % (MAX_ELEMENT / 2 + 1) + rand() % (MAX_ELEMENT / 2 + 1);
-    }
-
-    return arr;
-}
-
-
-
-
-
-
-void writeArray(const int *arr, const size_t n)
-{
-    size_t i;
-    i = 0;
-
-    if (arr != NULL && n != 0)
-    {
-        printf("BB %d %d\n", n, i);
-        for (i = 0; i < n; ++i)
-        {
-            printf("%d ", arr[i]);
-        }
-        printf("\n");
-    }
-    else
-        printf("Ошибка состояния массива.\n");
-}
