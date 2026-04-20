@@ -23,6 +23,7 @@ void writeArray(const int *arr, const size_t n);
 void swap(int *arr, int i, int j);
 
 void printAnalysis();
+void writePurpose();
 
 // 20 массив из случайных чисел с неравномерным распределением
 // 31 массив с равномерно распределёнными повторениями
@@ -42,6 +43,8 @@ int main(void) // Вариант 20
 
     srand(time(NULL));
     setlocale(LC_ALL, "Russian");
+
+    writePurpose();
 
     length = scanInt(1, 1000, "Введите длину: ");
 
@@ -65,6 +68,11 @@ int main(void) // Вариант 20
     free(genArrNSA);
     free(genArrLVA);
     return 0;
+}
+
+void writePurpose()
+{
+    printf("Программа генерирует массивы из элементов в диапазоне [1,10000] по определённым правилам или обладающим определёнными свойствами. Далее сортирует каждый массив тремя способами и отображает в таблице сравнительную характеристику по количеству сравнений среди элементов и их обменов.\n");
 }
 
 void printAnalysis()
