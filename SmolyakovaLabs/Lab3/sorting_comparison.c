@@ -69,7 +69,7 @@ int main(void) // Вариант 20
 
 void printAnalysis()
 {
-    printf("Вывод: в среднем, лучшей сортировкой можно считать");
+    printf("Вывод: в среднем, лучшей сортировкой можно считать сортировку вставками. ");
 }
 
 void printTableOnNonuniformGeneratedArray(int* arr, int length)
@@ -329,25 +329,37 @@ int* generateNonuniformRandomArray(size_t length)
 int* generateArrayWithUniformRepetitions(size_t length)
 {
     const int MAX_ELEMENT = 10000;
-    int i, repetitionsLength;
+    int i, repetitionsLength, maxRep;
     int *arr;
 
-    // Безопасное вычисление длины повторяющегося блока
-    if (length < 2) {
+    maxRep = 0;
+    repetitionsLength = 0;
+
+    if (length < 2) 
+    {
         repetitionsLength = length;
-    } else {
-        int maxRep = length / 2;
-        if (maxRep < 2) maxRep = 2;
+    } 
+    else 
+    {
+        maxRep = length / 2;
+        if (maxRep < 2) 
+            maxRep = 2;
         repetitionsLength = 2 + rand() % (maxRep - 1);
     }
 
     arr = (int*)malloc(length * sizeof(int));
-    if (!arr) return NULL;
 
-    for (i = 0; i < length; ++i) {
-        if (i < repetitionsLength) {
+    if (!arr) 
+        return NULL;
+
+    for (i = 0; i < length; ++i) 
+    {
+        if (i < repetitionsLength) 
+        {
             arr[i] = rand() % (MAX_ELEMENT + 1);
-        } else {
+        } 
+        else 
+        {
             arr[i] = arr[i - repetitionsLength];
         }
     }

@@ -3,20 +3,6 @@
 #include <time.h>
 #include <string.h>
 #include "algorithms.h"
-//#include <time.h>
-
-// struct SortMetrics
-// {
-//     long long comparisons;
-//     long long swaps;
-// };
-
-// void swap(int **dataArray, int i, int j)
-// {
-//     (*dataArray)[i] = (*dataArray)[i] + (*dataArray)[j];
-//     (*dataArray)[j] = (*dataArray)[i] - (*dataArray)[j];
-//     (*dataArray)[i] = (*dataArray)[i] - (*dataArray)[j];
-// }
 
 void swap(int *arr, int i, int j)
 {
@@ -30,9 +16,10 @@ void swap(int *arr, int i, int j)
 int* selectionSort(int *unsortedArray, size_t length, long long *comparisonCount, long long *swapCount) 
 {
     int j, i, temp;
-    int *sortedArray;
+    int *sortedArray, minIdx;
 
     temp = 0;
+    minIdx = 0;
 
     sortedArray = (int*)malloc(length * sizeof(int));
 
@@ -44,20 +31,20 @@ int* selectionSort(int *unsortedArray, size_t length, long long *comparisonCount
     for (i = 0; i < length - 1; ++i) 
     {
       
-        int min_idx = i;
+        minIdx = i;
         
         for (j = i + 1; j < length; ++j) 
         {
-            if (sortedArray[j] < sortedArray[min_idx]) 
+            if (sortedArray[j] < sortedArray[minIdx]) 
             {
-                min_idx = j;
+                minIdx = j;
             }
             (*comparisonCount)++;
         }
         
         temp = sortedArray[i];
-        sortedArray[i] = sortedArray[min_idx];
-        sortedArray[min_idx] = temp;
+        sortedArray[i] = sortedArray[minIdx];
+        sortedArray[minIdx] = temp;
         (*swapCount)++;
     }
 
@@ -87,7 +74,7 @@ int* insertionSort(int *unsortedArray, size_t length, long long *comparisonCount
             sortedArray[j + 1] = sortedArray[j];
             j--;
             (*swapCount)++;
-            (*comparisonCount)++; // ???
+            (*comparisonCount)++;
         }
 
         (*comparisonCount)++;
