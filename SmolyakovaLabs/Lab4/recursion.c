@@ -36,7 +36,9 @@ int main(void)
     tarIndex = binaryFind(arr, length, 0, length - 1, target);
     writeAnswer(tarIndex);
 
-    return 1;
+    free(arr);
+
+    return 0;
 }
 
 void writePurpose()
@@ -138,7 +140,7 @@ int scanInt(const int MIN_NUMBER, const int MAX_NUMBER, const char myString[])
 
     do
     {
-        printf(myString);
+        printf("%s", myString);
         isIncorrect = 0;
 
         if (scanf("%d%c", &number, &ch) == 0 || !(isspace(ch) || ch == EOF))

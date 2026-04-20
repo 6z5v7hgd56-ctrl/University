@@ -67,6 +67,7 @@ int main(void) // Вариант 20
     free(genArrASA);
     free(genArrNSA);
     free(genArrLVA);
+    
     return 0;
 }
 
