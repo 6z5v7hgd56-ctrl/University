@@ -12,7 +12,6 @@ void swap(int *arr, int i, int j)
     arr[j] = temp;
 }
 
-
 int* selectionSort(int *unsortedArray, size_t length, long long *comparisonCount, long long *swapCount) 
 {
     int j, i, temp;

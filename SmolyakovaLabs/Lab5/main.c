@@ -11,7 +11,10 @@ int main(void)
     head->data = 0;
 
     fillList(head);
-    showList();
+
+    printf("  A%dA  \n", head->next->data);
+
+    showNumberedList(head);
 
 
     return 0;

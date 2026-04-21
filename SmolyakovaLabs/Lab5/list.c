@@ -1,5 +1,15 @@
 #include "list.h"
 
+void showMenu()
+{
+    printf("\n====== МЕНЮ ======\n");
+    printf("1 - Вывести значения списка\n");
+    printf("2 - Вставка в начало\n");
+    printf("3 - Вставка в конец\n");
+    printf("4 - Удаление элемента\n");
+    printf("5 - Поиск элемента\n\n");
+}
+
 node* fillList(node* head)
 {
     const int MAX_LENGTH  =   100;
@@ -25,7 +35,7 @@ node* fillList(node* head)
         curr->next = newElement;
         curr = curr->next;
 
-        printf("%s", "Введите значение элемента [%d]\n", i + 1);
+        printf("Введите значение элемента [%d]\n", i + 1);
         element = scanInt(MIN_ELEMENT, MAX_ELEMENT, "> ");
         curr->data = element;
     }
@@ -37,6 +47,8 @@ void showList(node* head)
 {
     node* curr;
 
+    curr = head;
+
     printf("Лист:\n");
 
     while (curr->next != NULL)
@@ -45,6 +57,27 @@ void showList(node* head)
         printf("%d ", curr->data);
     }
 }
+
+int showNumberedList(node* head)
+{
+    node* curr;
+    int counter;
+
+    curr = head;
+    counter = 1;
+
+    while (curr->next != NULL)
+    { 
+        curr = curr->next;
+        printf("[%3d] = %d\n", counter, curr->data);
+        counter++;
+    }
+
+    counter--;
+
+    return counter;
+}
+
 
 int scanInt(const int MIN_NUMBER, const int MAX_NUMBER, const char myString[])
 {
@@ -79,5 +112,86 @@ int scanInt(const int MIN_NUMBER, const int MAX_NUMBER, const char myString[])
     return number;
 }
 
+node* append(node* head)
+{
+    const int MAX_ELEMENT =  1000;
+    const int MIN_ELEMENT = -1000;
+    node* curr;
 
+    curr = head;
+
+    printf("%s", "\nПроизводится вставка нового элемента в конец\n");
+
+    while (curr->next != NULL)
+        curr = curr->next;
+
+    curr->next = (node*)malloc(sizeof(node));
+    curr = curr->next;
+    printf("%s", "Введите значение элемента\n");
+    curr->data = scanInt(MIN_ELEMENT, MAX_ELEMENT, "> ");
+
+    return head;
+}
+
+node* prepend(node* head)
+{    
+    const int MAX_ELEMENT =  1000;
+    const int MIN_ELEMENT = -1000;
+
+    node* firstElement;
+
+    printf("%s", "\nПроизводится вставка нового элемента в начало\n");
+
+    firstElement = head->next;
+
+    head->next = (node*)malloc(sizeof(node));
+    head->next->next = firstElement;
+
+    printf("%s", "Введите значение элемента\n");
+    head->next->data = scanInt(MIN_ELEMENT, MAX_ELEMENT, "> ");
+    
+    return head;
+}
+
+node* deleteElement(node* head)
+{
+    node* curr;
+    node* prev;
+    int length, delIndex, i;
+
+    length = 0;
+    delIndex = 0;
+
+    prev = head;
+    curr = head->next;
+
+    printf("%s", "Введите индекс элемента для его удаления\n");
+    length = showNumberedList(head);
+
+    delIndex = scanInt(1, length, "> ");
+
+    for (i = 1; i < delIndex; ++i)
+    {
+        prev = prev->next;
+        curr = curr->next;
+    }
+
+    if (curr->next == NULL)
+        prev->next = NULL;
+    else
+        prev->next = curr->next;
+
+    free(curr);
+
+    return head;
+}
+
+void findElement(node* head)
+{
+    node* curr;
+
+    curr = head->next;
+
+    
+}
 

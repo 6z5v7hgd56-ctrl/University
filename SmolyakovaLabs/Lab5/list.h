@@ -13,6 +13,10 @@ typedef struct node
 
 int scanInt(const int MIN_NUMBER, const int MAX_NUMBER, const char myString[]);
 node* fillList(node* head);
+void showList(node* head);
+node* append(node* head);
+node* prepend(node* head);
+void showNumberedList(node* head);
 
 
 
