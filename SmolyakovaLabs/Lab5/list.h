@@ -16,9 +16,12 @@ node* fillList(node* head);
 void showList(node* head);
 node* append(node* head);
 node* prepend(node* head);
-void showNumberedList(node* head);
-
-
-
+int showNumberedList(node* head);
+void findElement(node* head);
+node* deleteElement(node* head);
+void showMenu();
+void menuStage(node* head);
+void freeList(node* head);
+void writePurpose();
 
 #endif

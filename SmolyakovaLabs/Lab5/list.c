@@ -7,7 +7,13 @@ void showMenu()
     printf("2 - Вставка в начало\n");
     printf("3 - Вставка в конец\n");
     printf("4 - Удаление элемента\n");
-    printf("5 - Поиск элемента\n\n");
+    printf("5 - Поиск элемента\n");
+    printf("0 - Выход\n\n");
+}
+
+void writePurpose()
+{
+    printf("Программа демонстрирует работу со списками и работу функций добавления, удаления, поиска элементов в нём\n");
 }
 
 node* fillList(node* head)
@@ -40,6 +46,8 @@ node* fillList(node* head)
         curr->data = element;
     }
 
+    curr->next = NULL;
+
     return head;
 } 
 
@@ -49,13 +57,20 @@ void showList(node* head)
 
     curr = head;
 
-    printf("Лист:\n");
+    printf("Список:\n");
+
+    if (head->next == NULL)
+    {
+        printf("Список пуст\n");
+        return;
+    }
 
     while (curr->next != NULL)
     { 
         curr = curr->next;
         printf("%d ", curr->data);
     }
+    printf("\n");
 }
 
 int showNumberedList(node* head)
@@ -72,7 +87,7 @@ int showNumberedList(node* head)
         printf("[%3d] = %d\n", counter, curr->data);
         counter++;
     }
-
+    
     counter--;
 
     return counter;
@@ -129,6 +144,7 @@ node* append(node* head)
     curr = curr->next;
     printf("%s", "Введите значение элемента\n");
     curr->data = scanInt(MIN_ELEMENT, MAX_ELEMENT, "> ");
+    curr->next = NULL;
 
     return head;
 }
@@ -162,6 +178,12 @@ node* deleteElement(node* head)
     length = 0;
     delIndex = 0;
 
+    if (head->next == NULL)
+    {
+        printf("Список пуст\n");
+        return head;
+    }
+
     prev = head;
     curr = head->next;
 
@@ -188,10 +210,77 @@ node* deleteElement(node* head)
 
 void findElement(node* head)
 {
+    const int MAX_ELEMENT =  1000;
+    const int MIN_ELEMENT = -1000;
     node* curr;
+    int target, index;
+    _Bool isNotFound;
 
     curr = head->next;
+    isNotFound = 1;
+    index = 0;
+    target = 0;
 
-    
+    if (head->next == NULL)
+    {
+        printf("Список пуст\n");
+        return;
+    }
+
+    printf("Введите искомый элемент\n");
+    target = scanInt(MIN_ELEMENT, MAX_ELEMENT, "> ");
+
+    while (curr != NULL && isNotFound)
+    {
+        index++;
+
+        if (curr->data == target)
+            isNotFound = 0;
+        
+        curr = curr->next;
+    }
+
+    if (isNotFound)
+        printf("Элемент в списке отсутствует\n");
+    else
+        printf("Элемент найден по индексу %d\n", index);
 }
 
+void menuStage(node* head)
+{
+    const int MAX_OPTION = 5;
+    const int MIN_OPTION = 0;
+    int option;
+
+    option = 0;
+
+    do {
+        showMenu();
+        option = scanInt(MIN_OPTION, MAX_OPTION, "> ");
+        
+        switch(option) {
+            case 1: showList(head); 
+                break;
+            case 2: prepend(head);
+                break;
+            case 3: append(head);  
+                break;
+            case 4: deleteElement(head); 
+                break;
+            case 5: findElement(head); 
+                break;
+            case 0: printf("\n====== ВЫХОД ======\n"); 
+                break;
+        }
+
+    } while (option != 0);
+}
+
+void freeList(node* head)
+{    
+    if (head == NULL) 
+        return;  
+
+    freeList(head->next);
+    free(head);
+}

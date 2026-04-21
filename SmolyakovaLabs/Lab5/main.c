@@ -10,12 +10,15 @@ int main(void)
     head->next = NULL;
     head->data = 0;
 
+    writePurpose();
+
     fillList(head);
-
-    printf("  A%dA  \n", head->next->data);
-
     showNumberedList(head);
 
+    menuStage(head);
+
+    freeList(head);    
+    head = NULL;
 
     return 0;
 }
