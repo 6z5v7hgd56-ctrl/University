@@ -23,5 +23,7 @@ void showMenu();
 void menuStage(node* head);
 void freeList(node* head);
 void writePurpose();
+node* insert(node* head);
+void checkIsSorted(node* head);
 
 #endif

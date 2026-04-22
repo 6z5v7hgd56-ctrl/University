@@ -3,17 +3,19 @@
 void showMenu()
 {
     printf("\n====== МЕНЮ ======\n");
-    printf("1 - Вывести значения списка\n");
+    printf("1 - Вывод значений списка\n");
     printf("2 - Вставка в начало\n");
     printf("3 - Вставка в конец\n");
-    printf("4 - Удаление элемента\n");
-    printf("5 - Поиск элемента\n");
+    printf("4 - Вставка по индексу\n");
+    printf("5 - Удаление элемента\n");
+    printf("6 - Поиск элемента\n");
+    printf("7 - Проверка отсортирован ли список\n");
     printf("0 - Выход\n\n");
 }
 
 void writePurpose()
 {
-    printf("Программа демонстрирует работу со списками и работу функций добавления, удаления, поиска элементов в нём\n");
+    printf("Программа демонстрирует работу со списками и работу функций добавления, удаления, поиска элементов в нём, а также проверку является ли список отсортированным по не убыванию\n");
 }
 
 node* fillList(node* head)
@@ -169,6 +171,49 @@ node* prepend(node* head)
     return head;
 }
 
+node* insert(node* head)
+{
+    const int MAX_ELEMENT =  1000;
+    const int MIN_ELEMENT = -1000;
+    node* curr;
+    node* prev;
+    node* new;
+    int length, insIndex, i;
+
+    length = 0;
+    insIndex = 0;
+
+    if (head->next == NULL)
+    {
+        printf("Список пуст\n");
+        return head;
+    }
+
+    prev = head;
+    curr = head->next;
+
+    printf("%s", "Введите индекс элемента для вставки туда\n");
+    length = showNumberedList(head);
+
+    insIndex = scanInt(1, length, "> ");
+
+    for (i = 1; i < insIndex; ++i)
+    {
+        prev = prev->next;
+        curr = curr->next;
+    }
+
+    new = (node*)malloc(sizeof(node));
+
+    prev->next = new;
+    new->next = curr;
+    
+    printf("%s", "Введите значение элемента\n");
+    new->data = scanInt(MIN_ELEMENT, MAX_ELEMENT, "> ");
+
+    return head;
+}
+
 node* deleteElement(node* head)
 {
     node* curr;
@@ -246,9 +291,37 @@ void findElement(node* head)
         printf("Элемент найден по индексу %d\n", index);
 }
 
+void checkIsSorted(node* head)
+{
+    node* curr;
+    curr = head->next;
+    _Bool isSorted;
+
+    isSorted = 1;
+
+    if (head->next == NULL)
+    {
+        printf("Список пуст\n");
+        return;
+    }
+
+    while (curr->next != NULL && isSorted)
+    {
+        if (curr->data > curr->next->data)
+            isSorted = 0;
+        curr = curr->next;
+    }
+
+    if (isSorted)
+        printf("Значения списка отсортированы по не убыванию\n");
+    else
+        printf("Значения списка НЕ являются отсортированными\n");
+
+}
+
 void menuStage(node* head)
 {
-    const int MAX_OPTION = 5;
+    const int MAX_OPTION = 7;
     const int MIN_OPTION = 0;
     int option;
 
@@ -265,9 +338,13 @@ void menuStage(node* head)
                 break;
             case 3: append(head);  
                 break;
-            case 4: deleteElement(head); 
+            case 4: insert(head); 
                 break;
-            case 5: findElement(head); 
+            case 5: deleteElement(head); 
+                break;
+            case 6: findElement(head); 
+                break;
+            case 7: checkIsSorted(head); 
                 break;
             case 0: printf("\n====== ВЫХОД ======\n"); 
                 break;
