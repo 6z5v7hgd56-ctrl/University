@@ -4,37 +4,40 @@
 #include <ctype.h>
 #include <locale.h>
 
-void quicksort(int **dataArray, const int arrayLength, int low, int high);
-int partition(int **dataArray, const int arrayLength, int low, int high);
-void swap(int **dataArray, int i, int j);
+int quicksort(int** dataArray, const int arrayLength, int low, int high, int recLvl);
+int partition(int** dataArray, const int arrayLength, int low, int high);
+void swap(int** dataArray, int i, int j);
 int scanInt(const int MIN_NUMBER, const int MAX_NUMBER, const char myString[]);
-void fillArray(int **arr, int *n);
-int binaryFind(int* arr, int length, int left, int right, int target);
+void fillArray(int** arr, int *n);
+int binaryFind(int* arr, int length, int left, int right, int target, int* recLvl);
 void writeArray(const int arr[], const size_t n);
-void writeAnswer(int tarIndex);
+void writeAnswer(int tarIndex, int recLvl);
 void writePurpose();
+
+// ! Показать уровень вложенности, вывести формулу от какого порядка элементов зависит вложенность и сравнить итерационный и рекурсивный подходы.
 
 int main(void) 
 {
     const int MAX_ELEMENT =  1000;
     const int MIN_ELEMENT = -1000;
-    int *arr;
+    int* arr, recLvl;
     int length, target, tarIndex;
 
     length = 0;
     target = 0;
+    recLvl = 0;
 
     setlocale(LC_ALL, "Russian");
 
     writePurpose();
 
     fillArray(&arr, &length);
-    quicksort(&arr, length, 0, length - 1);
+    quicksort(&arr, length, 0, length - 1, 0);
     printf("Массив после сортировки:\n");
     writeArray(arr, (size_t)length);
     target = scanInt(MIN_ELEMENT, MAX_ELEMENT, "Введите число, которое хотите найти бинарным поиском: ");
-    tarIndex = binaryFind(arr, length, 0, length - 1, target);
-    writeAnswer(tarIndex);
+    tarIndex = binaryFind(arr, length, 0, length - 1, target, &recLvl);
+    writeAnswer(tarIndex, recLvl);
 
     free(arr);
 
@@ -43,19 +46,18 @@ int main(void)
 
 void writePurpose()
 {
-    printf("Программа демонстрирует реализацию рекурсивного бинарного поиска. Пользователь вводит массив, массив сортирует методом быстрой сортировки Хоара, пользователь вводит элемент, индекс которого хочет найти в отсортированном массиве, после чего программа выводит результат.\n");
+    printf("Программа демонстрирует реализацию рекурсивного бинарного поиска. Пользователь вводит массив, массив сортируется методом быстрой сортировки Хоара, пользователь вводит элемент, индекс которого хочет найти в отсортированном массиве, после чего программа выводит результат.\n");
 }
 
-void writeAnswer(int tarIndex)
+void writeAnswer(int tarIndex, int recLvl)
 {
     if (tarIndex == -1)
-    {
         printf("Элемент отсутствует во введённом массиве\n");
-    }
     else
-    {
         printf("Элемент найден в отсортированном массиве по индексу %d\n", tarIndex + 1);
-    }
+
+    printf("Уровень вложенности бинарного поиска равен %d\n", recLvl);
+    printf("\nВывод: основное принципиальное различие в итерационном подходе и рекурсивном состоит в использовании стека вызовов при рекурсивном подходе, следовательно лучше для больших массивов будет итерационный подход, однако рекурсивный отличается простотой своей реализации.\n - Вложенность будет зависеть от длины входного массива и от положения искомого элемента в нём? но не зависит из значения элемента. \n - Самыми простыми вариантами будут когда элемент находится в центре отсортированного массива либо на позиции 1/4, 3/4 массива. \n - Максимальная глубина при log2(N) + 1, что в том числе соответствует нахождению элемента на краю отсортированного массива.\n");
 }
 
 void writeArray(const int arr[], const size_t n)
@@ -113,19 +115,22 @@ int partition(int **dataArray, const int arrayLength, int low, int high)
     return j;
 }
 
-void quicksort(int **dataArray, const int arrayLength, int low, int high)
+int quicksort(int **dataArray, const int arrayLength, int low, int high, int recLvl)
 {
     int point;
     point = 0;
 
     if (*dataArray == NULL || dataArray == NULL)
         printf("Массив пуст, сначала введите массив через соответствующий пункт меню\n");
-    else if (low < high)
-    {
-        point = partition(dataArray, arrayLength, low, high);
-        quicksort(&(*dataArray), arrayLength, low, point);
-        quicksort(&(*dataArray), arrayLength, point + 1, high);
-    }
+    else 
+        if (low < high)
+        {
+            point = partition(dataArray, arrayLength, low, high);
+            quicksort(&(*dataArray), arrayLength, low, point, recLvl++);
+            quicksort(&(*dataArray), arrayLength, point + 1, high, recLvl++);
+        }
+
+    return recLvl;
 }
 
 int scanInt(const int MIN_NUMBER, const int MAX_NUMBER, const char myString[])
@@ -194,12 +199,13 @@ void fillArray(int **arr, int *n)
     }
 }
 
-int binaryFind(int* arr, int length, int left, int right, int target)
+int binaryFind(int* arr, int length, int left, int right, int target, int* recLvl)
 {
     int index; 
     int middle;
 
     index = -1;
+    (*recLvl)++;
 
     if (left == right && arr[left] == target)
         return left;
@@ -209,10 +215,18 @@ int binaryFind(int* arr, int length, int left, int right, int target)
 
     middle = (left + right) / 2; 
 
+    if (arr[middle] == target) 
+        return middle;
     if (arr[middle] < target)
-        index = binaryFind(arr, length, middle + 1, right, target);
+    {
+        (*recLvl)++;
+        index = binaryFind(arr, length, middle + 1, right, target, recLvl);
+    }
     else
-        index = binaryFind(arr, length, left, middle, target);
+    {
+        (*recLvl)++;
+        index = binaryFind(arr, length, left, middle, target, recLvl);
+    }
 
     return index;
 }

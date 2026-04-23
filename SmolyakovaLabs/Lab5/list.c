@@ -7,7 +7,7 @@ void showMenu()
     printf("2 - Вставка в начало\n");
     printf("3 - Вставка в конец\n");
     printf("4 - Вставка по индексу\n");
-    printf("5 - Удаление элемента\n");
+    printf("5 - Удаление элемента по значению\n");
     printf("6 - Поиск элемента\n");
     printf("7 - Проверка отсортирован ли список\n");
     printf("0 - Выход\n\n");
@@ -148,6 +148,8 @@ node* append(node* head)
     curr->data = scanInt(MIN_ELEMENT, MAX_ELEMENT, "> ");
     curr->next = NULL;
 
+    showList(head);
+
     return head;
 }
 
@@ -167,7 +169,9 @@ node* prepend(node* head)
 
     printf("%s", "Введите значение элемента\n");
     head->next->data = scanInt(MIN_ELEMENT, MAX_ELEMENT, "> ");
-    
+
+    showList(head);
+
     return head;
 }
 
@@ -211,19 +215,20 @@ node* insert(node* head)
     printf("%s", "Введите значение элемента\n");
     new->data = scanInt(MIN_ELEMENT, MAX_ELEMENT, "> ");
 
+    showList(head);
+
     return head;
 }
 
 node* deleteElement(node* head)
 {
+    const int MAX_ELEMENT =  1000;
+    const int MIN_ELEMENT = -1000;
     node* curr;
     node* prev;
-    int length, delIndex, i;
+    int delByData;
 
-    length = 0;
-    delIndex = 0;
-
-    if (head->next == NULL)
+    if (head == NULL || head->next == NULL)
     {
         printf("Список пуст\n");
         return head;
@@ -232,26 +237,118 @@ node* deleteElement(node* head)
     prev = head;
     curr = head->next;
 
-    printf("%s", "Введите индекс элемента для его удаления\n");
-    length = showNumberedList(head);
+    printf("%s", "Введите значение элемента для его удаления\n");
+    showList(head);
 
-    delIndex = scanInt(1, length, "> ");
+    delByData = scanInt(MIN_ELEMENT, MAX_ELEMENT, "> ");
 
-    for (i = 1; i < delIndex; ++i)
+    while (curr != NULL)
     {
-        prev = prev->next;
-        curr = curr->next;
+        if (curr->data == delByData)
+        {
+            prev->next = curr->next;
+            free(curr);
+            curr = prev->next; 
+        }
+        else
+        {
+            prev = curr;
+            curr = curr->next;
+        }
     }
 
-    if (curr->next == NULL)
-        prev->next = NULL;
-    else
-        prev->next = curr->next;
-
-    free(curr);
+    showList(head);
 
     return head;
 }
+
+// node* deleteElement(node* head)
+// {
+//     const int MAX_ELEMENT =  1000;
+//     const int MIN_ELEMENT = -1000;
+//     node* curr;
+//     node* prev;
+//     int delByData, i;
+
+//     delByData = 0;
+
+//     if (head->next == NULL)
+//     {
+//         printf("Список пуст\n");
+//         return head;
+//     }
+
+//     prev = head;
+//     curr = head->next;
+
+//     printf("%s", "Введите значение элемента для его удаления\n");
+//     showList(head);
+
+//     delByData = scanInt(MIN_ELEMENT, MAX_ELEMENT, "> ");
+
+//     while (prev->next != NULL)
+//     {
+//         prev = prev->next;
+//         curr = prev->next;
+
+//         if (curr->data == delByData)
+//         {
+//             if (curr->next == NULL)
+//                 prev->next = NULL;
+//             else
+//                 prev->next = curr->next;
+
+//             free(curr);
+//         }
+//     }
+
+//     printf("Список:\n");
+//     showList(head);
+
+//     return head;
+// }
+
+// node* deleteElement(node* head)
+// {
+//     node* curr;
+//     node* prev;
+//     int length, delIndex, i;
+
+//     length = 0;
+//     delIndex = 0;
+
+//     if (head->next == NULL)
+//     {
+//         printf("Список пуст\n");
+//         return head;
+//     }
+
+//     prev = head;
+//     curr = head->next;
+
+//     printf("%s", "Введите индекс элемента для его удаления\n");
+//     length = showNumberedList(head);
+
+//     delIndex = scanInt(1, length, "> ");
+
+//     for (i = 1; i < delIndex; ++i)
+//     {
+//         prev = prev->next;
+//         curr = curr->next;
+//     }
+
+//     if (curr->next == NULL)
+//         prev->next = NULL;
+//     else
+//         prev->next = curr->next;
+
+//     free(curr);
+
+//     printf("Список:\n");
+//     showList(head);
+
+//     return head;
+// }
 
 void findElement(node* head)
 {
@@ -311,6 +408,8 @@ void checkIsSorted(node* head)
             isSorted = 0;
         curr = curr->next;
     }
+
+    showList(head);
 
     if (isSorted)
         printf("Значения списка отсортированы по не убыванию\n");
