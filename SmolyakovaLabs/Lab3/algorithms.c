@@ -14,7 +14,7 @@ void printAnalysis()
     printf("Вывод: в среднем, лучшей сортировкой можно считать сортировку вставками. ");
 }
 
-void printTableOnNonuniformGeneratedArray(int* arr, int length)
+int printTableOnNonuniformGeneratedArray(int* arr, int length)
 {
     long long compCount, swapCount;
     int *sorted;
@@ -84,9 +84,10 @@ void printTableOnNonuniformGeneratedArray(int* arr, int length)
             break;
     }
 
+    return whatSortIsBetter;
 }
 
-void printTableOnArrayWithUniformRepetitions(int* arr, int length)
+int printTableOnArrayWithUniformRepetitions(int* arr, int length)
 {
     long long compCount, swapCount;
     int *sorted;
@@ -155,9 +156,11 @@ void printTableOnArrayWithUniformRepetitions(int* arr, int length)
             printf("Лучшей при генерации массива с равномерно распределёнными повторениями считается сортировка выбором.\n\n\n");
             break;
     }
+
+    return whatSortIsBetter;
 }
 
-void printTableOnAlternatingSeriesArray(int* arr, int length)
+int printTableOnAlternatingSeriesArray(int* arr, int length)
 {
     long long compCount, swapCount;
     int *sorted;
@@ -226,9 +229,10 @@ void printTableOnAlternatingSeriesArray(int* arr, int length)
             printf("Лучшей при генерации массива с чередующимися возрастающими и убывающими сериями считается сортировка выбором.\n\n\n");
             break;
     }
+    return whatSortIsBetter;
 }
 
-void printTableOnNearlySortedArray(int* arr, int length)
+int printTableOnNearlySortedArray(int* arr, int length)
 {
     long long compCount, swapCount;
     int *sorted;
@@ -297,9 +301,10 @@ void printTableOnNearlySortedArray(int* arr, int length)
             printf("Лучшей при генерации почти отсортированного массива считается сортировка выбором.\n\n\n");
             break;
     }
+    return whatSortIsBetter;
 }
 
-void printTableOnLowVarianceArray(int* arr, int length)
+int printTableOnLowVarianceArray(int* arr, int length)
 {
     long long compCount, swapCount;
     int *sorted;
@@ -368,6 +373,8 @@ void printTableOnLowVarianceArray(int* arr, int length)
             printf("Лучшей при генерации массива где следующий элемент немного отличается от предыдущего считается сортировка выбором.\n\n\n");
             break;
     }
+
+    return whatSortIsBetter;
 }
 
 int scanInt(const int MIN_NUMBER, const int MAX_NUMBER, const char myString[])
@@ -739,7 +746,8 @@ void generateAndAnalyze()
 {
     int length1, length2, length3, length4;
     int *genArrNRA, *genArrAWUR, *genArrASA, *genArrNSA, *genArrLVA;
-
+    int betterSort1, betterSort2, betterSort3, betterSort4, betterSort5;
+    int betterSort6, betterSort7, betterSort8, betterSort9, betterSort10;
     length1 = 50;
     length2 = 100;
     length3 = 500;
@@ -757,11 +765,11 @@ void generateAndAnalyze()
     genArrNSA = generateNearlySortedArray(length1);
     genArrLVA = generateLowVarianceArray(length1);
 
-    printTableOnNonuniformGeneratedArray(genArrNRA, length1);
-    printTableOnArrayWithUniformRepetitions(genArrAWUR, length1);
-    printTableOnAlternatingSeriesArray(genArrASA, length1);
-    printTableOnNearlySortedArray(genArrNSA, length1);
-    printTableOnLowVarianceArray(genArrLVA, length1);
+    betterSort1 = printTableOnNonuniformGeneratedArray(genArrNRA, length1);
+    betterSort2 = printTableOnArrayWithUniformRepetitions(genArrAWUR, length1);
+    betterSort3 = printTableOnAlternatingSeriesArray(genArrASA, length1);
+    betterSort4 = printTableOnNearlySortedArray(genArrNSA, length1);
+    betterSort5 = printTableOnLowVarianceArray(genArrLVA, length1);
 
     srand(time(NULL));
 
@@ -811,10 +819,140 @@ void generateAndAnalyze()
     genArrNSA = generateNearlySortedArray(length4);
     genArrLVA = generateLowVarianceArray(length4);
 
-    printTableOnNonuniformGeneratedArray(genArrNRA, length4);
-    printTableOnArrayWithUniformRepetitions(genArrAWUR, length4);
-    printTableOnAlternatingSeriesArray(genArrASA, length4);
-    printTableOnNearlySortedArray(genArrNSA, length4);
-    printTableOnLowVarianceArray(genArrLVA, length4);
+    betterSort6 = printTableOnNonuniformGeneratedArray(genArrNRA, length4);
+    betterSort7 = printTableOnArrayWithUniformRepetitions(genArrAWUR, length4);
+    betterSort8 = printTableOnAlternatingSeriesArray(genArrASA, length4);
+    betterSort9 = printTableOnNearlySortedArray(genArrNSA, length4);
+    betterSort10 = printTableOnLowVarianceArray(genArrLVA, length4);
 
+    //printAnalyze();
+
+    printf("====== ДЛЯ МАЛЫХ ЗНАЧЕНИЙ ======\n");
+    switch(betterSort1)
+    {
+        case 0: 
+            printf("Лучшей при генерации массива из случайных чисел с неравномерным распределением считается сортировка пузырьком.\n");
+            break;
+        case 1: 
+            printf("Лучшей при генерации массива из случайных чисел с неравномерным распределением считается сортировка вставками.\n");
+            break;
+        case 2: 
+            printf("Лучшей при генерации массива из случайных чисел с неравномерным распределением считается сортировка выбором.\n");
+            break;
+    }
+
+    switch(betterSort2)
+    {
+        case 0: 
+            printf("Лучшей при генерации массива с равномерно распределёнными повторениями считается сортировка пузырьком.\n");
+            break;
+        case 1: 
+            printf("Лучшей при генерации массива с равномерно распределёнными повторениями считается сортировка вставками.\n");
+            break;
+        case 2: 
+            printf("Лучшей при генерации массива с равномерно распределёнными повторениями считается сортировка выбором.\n");
+            break;
+    }
+    switch(betterSort3)
+    {
+        case 0: 
+            printf("Лучшей при генерации массива с чередующимися возрастающими и убывающими сериями считается сортировка пузырьком.\n");
+            break;
+        case 1: 
+            printf("Лучшей при генерации массива с чередующимися возрастающими и убывающими сериями считается сортировка вставками.\n");
+            break;
+        case 2: 
+            printf("Лучшей при генерации массива с чередующимися возрастающими и убывающими сериями считается сортировка выбором.\n");
+            break;
+    }
+    switch(betterSort4)
+    {
+        case 0: 
+            printf("Лучшей при генерации почти отсортированного массива считается сортировка пузырьком.\n");
+            break;
+        case 1: 
+            printf("Лучшей при генерации почти отсортированного массива считается сортировка вставками.\n");
+            break;
+        case 2: 
+            printf("Лучшей при генерации почти отсортированного массива считается сортировка выбором.\n");
+            break;
+    }
+    switch(betterSort5)
+    {
+        case 0: 
+            printf("Лучшей при генерации массива где следующий элемент немного отличается от предыдущего считается сортировка пузырьком.\n");
+            break;
+        case 1: 
+            printf("Лучшей при генерации массива где следующий элемент немного отличается от предыдущего считается сортировка вставками.\n");
+            break;
+        case 2: 
+            printf("Лучшей при генерации массива где следующий элемент немного отличается от предыдущего считается сортировка выбором.\n");
+            break;
+    }
+
+
+
+
+    printf("\n====== ДЛЯ БОЛЬШИХ ЗНАЧЕНИЙ ======\n");
+    switch(betterSort6)
+    {
+        case 0: 
+            printf("Лучшей при генерации массива из случайных чисел с неравномерным распределением считается сортировка пузырьком.\n");
+            break;
+        case 1: 
+            printf("Лучшей при генерации массива из случайных чисел с неравномерным распределением считается сортировка вставками.\n");
+            break;
+        case 2: 
+            printf("Лучшей при генерации массива из случайных чисел с неравномерным распределением считается сортировка выбором.\n");
+            break;
+    }
+
+    switch(betterSort7)
+    {
+        case 0: 
+            printf("Лучшей при генерации массива с равномерно распределёнными повторениями считается сортировка пузырьком.\n");
+            break;
+        case 1: 
+            printf("Лучшей при генерации массива с равномерно распределёнными повторениями считается сортировка вставками.\n");
+            break;
+        case 2: 
+            printf("Лучшей при генерации массива с равномерно распределёнными повторениями считается сортировка выбором.\n");
+            break;
+    }
+    switch(betterSort8)
+    {
+        case 0: 
+            printf("Лучшей при генерации массива с чередующимися возрастающими и убывающими сериями считается сортировка пузырьком.\n");
+            break;
+        case 1: 
+            printf("Лучшей при генерации массива с чередующимися возрастающими и убывающими сериями считается сортировка вставками.\n");
+            break;
+        case 2: 
+            printf("Лучшей при генерации массива с чередующимися возрастающими и убывающими сериями считается сортировка выбором.\n");
+            break;
+    }
+    switch(betterSort9)
+    {
+        case 0: 
+            printf("Лучшей при генерации почти отсортированного массива считается сортировка пузырьком.\n");
+            break;
+        case 1: 
+            printf("Лучшей при генерации почти отсортированного массива считается сортировка вставками.\n");
+            break;
+        case 2: 
+            printf("Лучшей при генерации почти отсортированного массива считается сортировка выбором.\n");
+            break;
+    }
+    switch(betterSort10)
+    {
+        case 0: 
+            printf("Лучшей при генерации массива где следующий элемент немного отличается от предыдущего считается сортировка пузырьком.\n");
+            break;
+        case 1: 
+            printf("Лучшей при генерации массива где следующий элемент немного отличается от предыдущего считается сортировка вставками.\n");
+            break;
+        case 2: 
+            printf("Лучшей при генерации массива где следующий элемент немного отличается от предыдущего считается сортировка выбором.\n");
+            break;
+    }
 }

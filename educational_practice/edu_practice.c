@@ -1,0 +1,415 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <ctype.h>
+
+/*
+ (СФ) Организовать выдачу талонов к врачу
+
+ •Осуществлять поиск всех записей к врачу на конкретную дату
+    (ФИО врача ввести с клавиатуры);
+
+ •Осуществлять поиск записей о больном по ФИО;
+
+ •Предусмотреть возможность добавлять, удалять и
+    корректировать записи из списков, а также просматривать списки полностью.
+
+*/
+
+/*
+Каждая запись списка содержит:
+    дату,
+    время,
+    № очереди,
+    ФИО больного (изначально поле пустое),
+    номер кабинета,
+    код врача.
+ */
+
+/*
+ График работ содержит:
+    код врача,
+    специализацию врача,
+    ФИО врача,
+    временной диапазон работы на каждый день с понедельника по субботу.
+ */
+
+// TODO Перед удалением спрашивать подтверждение
+
+typedef struct date
+{
+    int day;
+    int month;
+    int year;
+} date;
+
+typedef struct time
+{
+    int minute;
+    int hour;
+} time;
+
+typedef struct appointment
+{
+    date appointmentDate;
+    time appointmentTime;
+
+    int queuePlace;
+
+    char name[30];          // Имя     
+    char surname[30];       // Фамилия 
+    char patronymic[30];    // Отчество
+
+    int cabinet;
+    int doctorID;
+
+    struct appointment* next;
+
+} appointment;
+
+typedef struct doctorSchedule
+{
+    int doctorID;
+    char specialization[50];
+
+    char name[30];       // Имя
+    char surname[30];    // Фамилия
+    char patronymic[30]; // Отчество
+
+    int schedule[6][2];
+
+    struct doctorSchedule* next;
+
+} doctorSchedule;
+
+void showMenu();
+void showPurpose();
+void writeMenuOptionHeader(int option);
+
+int getOption();
+void processUserChoice();
+
+// ! Menu function
+void readDataFormFiles(appointment *appointmentsHead, doctorSchedule *schedulesHead);
+void showLists(appointment *appointmentsHead, doctorSchedule *schedulesHead);
+void findData(appointment *appointmentsHead, doctorSchedule *schedulesHead);
+void addDataToList(appointment *appointmentsHead, doctorSchedule *schedulesHead);
+void deleteDataFromList(appointment *appointmentsHead, doctorSchedule *schedulesHead);
+void changeData(appointment *appointmentsHead, doctorSchedule *schedulesHead);
+void manageAppointments(appointment *appointmentsHead, doctorSchedule *schedulesHead);
+void quitWithoutSave();
+void quitAndSave(appointment *appointmentsHead, doctorSchedule *schedulesHead);
+
+appointment* fillAppointment();
+
+int scanInt(const int MIN_NUMBER, const int MAX_NUMBER, const char myString[]);
+
+int main(void)
+{
+    showPurpose();
+    processUserChoice();
+
+    return 0;
+}
+
+void processUserChoice()
+{
+    int option;
+    _Bool isContinue;
+    appointment *appointmentsHead;
+    doctorSchedule *schedulesHead;
+
+    appointmentsHead = (appointment*)malloc(sizeof(appointment));
+    schedulesHead = (doctorSchedule*)malloc(sizeof(doctorSchedule));
+
+    appointmentsHead->next = NULL;
+    schedulesHead->next = NULL;
+
+    option = 0;
+    isContinue = 1;
+
+    while (isContinue)
+    {
+        option = getOption();
+        writeMenuOptionHeader(option);
+
+        printf("\n%d\n", option);
+
+        switch (option)
+        {
+        case 1:
+            readDataFormFiles(appointmentsHead, schedulesHead);
+            break;
+        case 2:
+            showLists(appointmentsHead, schedulesHead);
+            break;
+        case 3:
+            // ! ============================ Не понятно что сортировать
+            break;
+        case 4:
+            findData(appointmentsHead, schedulesHead);
+            break;
+        case 5:
+            addDataToList(appointmentsHead, schedulesHead);
+            break;
+        case 6:
+            deleteDataFromList(appointmentsHead, schedulesHead);
+            break;
+        case 7:
+            changeData(appointmentsHead, schedulesHead);
+            break;
+        case 8:
+            manageAppointments(appointmentsHead, schedulesHead);
+            break;
+        case 9:
+            quitWithoutSave();
+            isContinue = 0;
+            break;
+        case 10:
+            quitAndSave(appointmentsHead, schedulesHead);
+            break;
+        }
+    }
+}
+
+void showMenu()
+{
+    printf("\n====== MENU ======\n");
+    printf(" 1 - Read data from files\n");
+    printf(" 2 - Show full lists\n");
+    printf(" 3 - Sort\n");
+    printf(" 4 - Find data\n");
+    printf(" 5 - Add data to list\n");
+    printf(" 6 - Delete data from list\n");
+    printf(" 7 - Change data\n");
+    printf(" 8 - Manage appointments\n");
+    printf(" 9 - Quit without save\n");
+    printf("10 - Quit and save\n");
+}
+
+void writeMenuOptionHeader(int option)
+{
+    printf("\n");
+
+    switch (option)
+    {
+    case 1:
+        printf("====== READING DATA ======");
+        break;
+    case 2:
+        printf("====== SHOWING LISTS ======");
+        break;
+    case 3:
+        printf("====== SORTING ======");
+        break;
+    case 4:
+        printf("====== FINDING DATA ======");
+        break;
+    case 5:
+        printf("====== ADDING DATA ======");
+        break;
+    case 6:
+        printf("====== DELETING DATA ======");
+        break;
+    case 7:
+        printf("====== CHANGING DATA ======");
+        break;
+    case 8:
+        printf("====== MANAGING APPOINTMENTS ======");
+        break;
+    case 9:
+        printf("====== QUITTING WITHOUT SAVE ======");
+        break;
+    case 10:
+        printf("====== QUITTING AND SAVING ======");
+        break;
+    }
+
+    printf("\n");
+}
+
+void showPurpose()
+{
+    printf("PURPOSE_PURPOSE_PURPOSE_PURPOSE_PURPOSE_PURPOSE_PURPOSE_PURPOSE\n");
+}
+
+int getOption()
+{
+    const int MAX_MENU_OPTION = 10;
+    const int MIN_MENU_OPTION = 1;
+    int option;
+    option = 0;
+
+    showMenu();
+    option = scanInt(MIN_MENU_OPTION, MAX_MENU_OPTION, "> ");
+
+    return option;
+}
+
+int scanInt(const int MIN_NUMBER, const int MAX_NUMBER, const char myString[])
+{
+    _Bool isIncorrect;
+    int number;
+    char ch;
+
+    isIncorrect = 0;
+    number = 0;
+    ch = 0;
+
+    do
+    {
+        printf("%s", myString);
+        isIncorrect = 0;
+
+        if (scanf("%d%c", &number, &ch) == 0 || !(isspace(ch) || ch == EOF))
+        {
+            isIncorrect = 1;
+            printf("Некорректный ввод, повторите попытку\n");
+            while (getchar() != '\n');
+        }
+
+        if (!isIncorrect && ((number < MIN_NUMBER) || (number > MAX_NUMBER)))
+        {
+            isIncorrect = 1;
+            printf("Число должно входить в диапазон [%d,%d]\n", MIN_NUMBER, MAX_NUMBER);
+        }
+
+    } while (isIncorrect);
+
+    return number;
+}
+
+void addDataToList(appointment *appointmentsHead, doctorSchedule *schedulesHead)
+{
+    int option;
+    option = 0;
+
+    appointment *apptCurr; 
+    doctorSchedule *schdlCurr;
+
+    apptCurr = appointmentsHead;
+    schdlCurr = schedulesHead;
+
+    printf("To which list will the data be added?\n");
+    printf(" 1 - Appointments list\n");
+    printf(" 2 - Schedule list\n");
+
+    option = scanInt(1, 2, "> ");
+
+    if (option == 1)
+    {
+        printf("\nThe data will be added to list of appointments\n");
+
+        while (apptCurr->next != NULL)
+            apptCurr = apptCurr->next;
+
+        apptCurr->next = fillAppointment();
+
+    }
+}
+
+/* 
+typedef struct appointment
+{
+    date appointmentDate;
+    time appointmentTime;
+
+    int queuePlace;
+
+    char name[30];          // Имя     
+    char surname[30];       // Фамилия 
+    char patronymic[30];    // Отчество
+
+    int cabinet;
+    int doctorID;
+
+    struct appointment *next;
+
+} appointment; 
+*/
+
+appointment* fillAppointment()
+{
+    const int MAX_ID = 1000000;
+    const int MAX_CABINET = 1000;
+    const int MAX_DAY = 31;
+    const int MAX_MONTH = 12;
+    const int MAX_YEAR = 2027;
+    const int MAX_HOUR = 23;
+    const int MAX_MINUTE = 59;
+
+    appointment* newAppointment;
+    newAppointment = (appointment*)malloc(sizeof(appointment));
+
+    printf("Write patient's\n");
+    printf("name: ");
+    scanf("%29s", newAppointment->name);
+    printf("surname: ");
+    scanf("%29s", newAppointment->surname);
+    printf("patronymic: ");
+    scanf("%29s", newAppointment->patronymic);
+
+    printf("\n");
+
+    printf("Write doctor's ID: ");
+    newAppointment->doctorID = scanInt(0, MAX_ID, "");
+    printf("Write doctor's cabinet: ");
+    newAppointment->cabinet = scanInt(0, MAX_CABINET, "");
+
+    printf("\n");
+
+    printf("Write appointment date\n");
+    printf("day: ");
+    newAppointment->appointmentDate.day = scanInt(1, MAX_DAY, "");
+    printf("month: ");
+    newAppointment->appointmentDate.month = scanInt(1, MAX_MONTH, "");
+    printf("year: ");
+    newAppointment->appointmentDate.year = scanInt(1, MAX_YEAR, "");
+
+    // ! Добавить проверку на соответствие месяца и дня в нём
+
+    printf("Write appointment time\n");
+    printf("hour: ");
+    newAppointment->appointmentTime.hour = scanInt(0, MAX_HOUR, "");
+    printf("minute: ");
+    newAppointment->appointmentTime.minute = scanInt(0, MAX_MINUTE, "");
+}
+
+void readDataFormFiles(appointment *appointmentsHead, doctorSchedule *schedulesHead)
+{
+
+}
+
+void showLists(appointment *appointmentsHead, doctorSchedule *schedulesHead)
+{
+
+}
+
+void findData(appointment *appointmentsHead, doctorSchedule *schedulesHead)
+{
+
+}
+
+void deleteDataFromList(appointment *appointmentsHead, doctorSchedule *schedulesHead)
+{
+
+}
+
+void changeData(appointment *appointmentsHead, doctorSchedule *schedulesHead)
+{
+
+}
+
+void manageAppointments(appointment *appointmentsHead, doctorSchedule *schedulesHead)
+{
+
+}
+
+void quitWithoutSave()
+{
+
+}
+
+void quitAndSave(appointment *appointmentsHead, doctorSchedule *schedulesHead)
+{
+
+}

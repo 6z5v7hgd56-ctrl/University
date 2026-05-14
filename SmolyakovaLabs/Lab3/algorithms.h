@@ -20,11 +20,11 @@ int* generateAlternatingSeriesArray(size_t length);
 int* generateNearlySortedArray(size_t length);
 int* generateLowVarianceArray(size_t length);
 
-void printTableOnNonuniformGeneratedArray(int* arr, int length);
-void printTableOnArrayWithUniformRepetitions(int* arr, int length);
-void printTableOnAlternatingSeriesArray(int* arr, int length);
-void printTableOnNearlySortedArray(int* arr, int length);
-void printTableOnLowVarianceArray(int* arr, int length);
+int printTableOnNonuniformGeneratedArray(int* arr, int length);
+int printTableOnArrayWithUniformRepetitions(int* arr, int length);
+int printTableOnAlternatingSeriesArray(int* arr, int length);
+int printTableOnNearlySortedArray(int* arr, int length);
+int printTableOnLowVarianceArray(int* arr, int length);
 
 int scanInt(const int MIN_NUMBER, const int MAX_NUMBER, const char myString[]);
 void writeArray(const int *arr, const size_t n);

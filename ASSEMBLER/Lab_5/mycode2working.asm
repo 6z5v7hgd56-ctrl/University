@@ -1,83 +1,85 @@
 .stack 100h
 
 .data
-    array dw 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20
-    msg db 'Multiple: $'          ; выводитс€ один раз
-    space db ' $'                 ; пробел между числами
-    newline db 13,10,'$'          ; перевод строки в конце
+    array dw 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,105,20
+    msg db 'Answers: $'          
+    space db ' $'                
+    newline db 13,10,'$'         
 
 .code
 
-; ѕодпрограмма печати числа из AX (без изменени€ регистров кроме AX?)
-print_num proc
-    push ax
-    push bx
-    push cx
-    push dx
-    mov cx, 0          ; счетчик цифр
-    mov bx, 10         ; делитель
+print_num 
+    PROC
+    PUSH AX
+    PUSH BX
+    PUSH CX
+    PUSH DX
+    MOV CX, 0        
+    MOV BX, 10
+           
 convert:
-    xor dx, dx
-    div bx             ; ax = частное, dx = остаток (цифра)
-    add dl, '0'
-    push dx
-    inc cx
-    test ax, ax
-    jnz convert
+    XOR DX, DX
+    DIV BX             
+    ADD DL, '0'
+    PUSH DX
+    INC CX
+    TEST AX, AX
+    JNZ convert  
+    
 print_digits:
-    pop dx
-    mov ah, 02h
-    int 21h
-    loop print_digits
-    pop dx
-    pop cx
-    pop bx
-    pop ax
-    ret
-print_num endp
+    POP DX
+    MOV AH, 02h
+    INT 21h
+    LOOP print_digits
+    POP DX
+    POP CX
+    POP BX
+    POP AX
+    RET
+print_num 
+    ENDP
 
 start:
-    mov ax, @data
-    mov ds, ax
+    MOV AX, @data
+    MOV DS, AX
 
-    ; ¬ывести "Multiple: " один раз
-    mov ah, 09h
-    lea dx, msg
-    int 21h
+    
+    MOV AH, 09h
+    LEA DX, msg
+    INT 21h
 
-    lea si, array       ; указатель на массив
-    mov cx, 20          ; количество элементов
+    LEA SI, array      
+    MOV CX, 20        
 
 check_next:
-    lodsw               ; загружаем слово в ax, si += 2
-    push ax             ; сохран€ем оригинал числа
-    mov bl, 5
-    div bl              ; ah = остаток, al = частное
-    cmp ah, 0
-    jne not_multiple
+    LODSW              
+    PUSH AX            
+    MOV BL, 5
+    DIV BL              
+    CMP AH, 0
+    JNE not_multiple
 
-    ; число кратно 5 Ц восстанавливаем и печатаем
-    pop ax              ; восстанавливаем число
-    call print_num
+  
+    POP AX             
+    CALL print_num
 
-    ; печатаем пробел (или можно зап€тую, но дл€ простоты пробел)
-    mov ah, 09h
-    lea dx, space
-    int 21h
+   
+    MOV AH, 09h
+    LEA DX, space
+    INT 21h
 
-    jmp next_element
+    JMP next_element
 
 not_multiple:
-    pop ax              ; убираем сохранЄнное число (оно не нужно)
+    POP AX             
 next_element:
-    loop check_next
+    LOOP check_next
 
-    ; печатаем перевод строки в конце
-    mov ah, 09h
-    lea dx, newline
-    int 21h
+    MOV AH, 09h
+    LEA DX, newline
+    INT 21h
 
-    mov ah, 4ch
-    int 21h
+    MOV AH, 4ch
+    INT 21h
 
-end start
+END start

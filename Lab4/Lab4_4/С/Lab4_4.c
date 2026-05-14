@@ -496,9 +496,12 @@ void changeElement(int **arr, int *n)
 
 void swap(int **dataArray, int i, int j)
 {
-    (*dataArray)[i] = (*dataArray)[i] + (*dataArray)[j];
-    (*dataArray)[j] = (*dataArray)[i] - (*dataArray)[j];
-    (*dataArray)[i] = (*dataArray)[i] - (*dataArray)[j];
+    if (i != j)
+    {
+        (*dataArray)[i] = (*dataArray)[i] + (*dataArray)[j];
+        (*dataArray)[j] = (*dataArray)[i] - (*dataArray)[j];
+        (*dataArray)[i] = (*dataArray)[i] - (*dataArray)[j];
+    }
 }
 
 int partition(int **dataArray, const int arrayLength, int low, int high)
