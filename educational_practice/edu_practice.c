@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <ctype.h>
+#include <string.h>
 
 /*
  (СФ) Организовать выдачу талонов к врачу
@@ -55,14 +56,14 @@ typedef struct appointment
 
     int queuePlace;
 
-    char name[30];          // Имя     
-    char surname[30];       // Фамилия 
-    char patronymic[30];    // Отчество
+    char name[30];       // Имя
+    char surname[30];    // Фамилия
+    char patronymic[30]; // Отчество
 
     int cabinet;
     int doctorID;
 
-    struct appointment* next;
+    struct appointment *next;
 
 } appointment;
 
@@ -75,9 +76,10 @@ typedef struct doctorSchedule
     char surname[30];    // Фамилия
     char patronymic[30]; // Отчество
 
-    int schedule[6][2];
+    int schedule[6][2]; // Индексы от 0 до 5 это дни от понедельника до субботы
+                        // Первое число - старт (в минутах), второе число конец (в минутах)
 
-    struct doctorSchedule* next;
+    struct doctorSchedule *next;
 
 } doctorSchedule;
 
@@ -86,7 +88,7 @@ void showPurpose();
 void writeMenuOptionHeader(int option);
 
 int getOption();
-void processUserChoice();
+void processUserChoice(appointment *appointmentsHead, doctorSchedule *schedulesHead);
 
 // ! Menu function
 void readDataFormFiles(appointment *appointmentsHead, doctorSchedule *schedulesHead);
@@ -99,30 +101,40 @@ void manageAppointments(appointment *appointmentsHead, doctorSchedule *schedules
 void quitWithoutSave();
 void quitAndSave(appointment *appointmentsHead, doctorSchedule *schedulesHead);
 
-appointment* fillAppointment();
+appointment *fillAppointment();
+doctorSchedule *fillSchedule();
+
+int getTimeInMinutes(int hour, int minute);
+
+int findMaxDay(int month, int year);
 
 int scanInt(const int MIN_NUMBER, const int MAX_NUMBER, const char myString[]);
+void getTimeFromOnlyMinutes(int amountOfMinutes, int *hour, int *minute);
+
+void freeLists(appointment *appointmentsHead, doctorSchedule *schedulesHead);
 
 int main(void)
 {
+    appointment *appointmentsHead;
+    doctorSchedule *schedulesHead;
+
+    appointmentsHead = (appointment *)malloc(sizeof(appointment));
+    schedulesHead = (doctorSchedule *)malloc(sizeof(doctorSchedule));
+
+    appointmentsHead->next = NULL;
+    schedulesHead->next = NULL;
+
     showPurpose();
-    processUserChoice();
+    processUserChoice(appointmentsHead, schedulesHead);
+    freeLists(appointmentsHead, schedulesHead);
 
     return 0;
 }
 
-void processUserChoice()
+void processUserChoice(appointment *appointmentsHead, doctorSchedule *schedulesHead)
 {
     int option;
     _Bool isContinue;
-    appointment *appointmentsHead;
-    doctorSchedule *schedulesHead;
-
-    appointmentsHead = (appointment*)malloc(sizeof(appointment));
-    schedulesHead = (doctorSchedule*)malloc(sizeof(doctorSchedule));
-
-    appointmentsHead->next = NULL;
-    schedulesHead->next = NULL;
 
     option = 0;
     isContinue = 1;
@@ -263,14 +275,15 @@ int scanInt(const int MIN_NUMBER, const int MAX_NUMBER, const char myString[])
         if (scanf("%d%c", &number, &ch) == 0 || !(isspace(ch) || ch == EOF))
         {
             isIncorrect = 1;
-            printf("Некорректный ввод, повторите попытку\n");
-            while (getchar() != '\n');
+            printf("Incorrect input, try again\n");
+            while (getchar() != '\n')
+                ;
         }
 
         if (!isIncorrect && ((number < MIN_NUMBER) || (number > MAX_NUMBER)))
         {
             isIncorrect = 1;
-            printf("Число должно входить в диапазон [%d,%d]\n", MIN_NUMBER, MAX_NUMBER);
+            printf("The number must be within the range [%d,%d]\n", MIN_NUMBER, MAX_NUMBER);
         }
 
     } while (isIncorrect);
@@ -283,7 +296,7 @@ void addDataToList(appointment *appointmentsHead, doctorSchedule *schedulesHead)
     int option;
     option = 0;
 
-    appointment *apptCurr; 
+    appointment *apptCurr;
     doctorSchedule *schdlCurr;
 
     apptCurr = appointmentsHead;
@@ -303,42 +316,34 @@ void addDataToList(appointment *appointmentsHead, doctorSchedule *schedulesHead)
             apptCurr = apptCurr->next;
 
         apptCurr->next = fillAppointment();
+    }
+    else
+    {
+        printf("\nThe data will be added to list of schedules\n");
 
+        while (schdlCurr->next != NULL)
+            schdlCurr = schdlCurr->next;
+
+        schdlCurr->next = fillSchedule();
     }
 }
 
-/* 
-typedef struct appointment
-{
-    date appointmentDate;
-    time appointmentTime;
-
-    int queuePlace;
-
-    char name[30];          // Имя     
-    char surname[30];       // Фамилия 
-    char patronymic[30];    // Отчество
-
-    int cabinet;
-    int doctorID;
-
-    struct appointment *next;
-
-} appointment; 
-*/
-
-appointment* fillAppointment()
+appointment *fillAppointment()
 {
     const int MAX_ID = 1000000;
     const int MAX_CABINET = 1000;
-    const int MAX_DAY = 31;
     const int MAX_MONTH = 12;
     const int MAX_YEAR = 2027;
     const int MAX_HOUR = 23;
     const int MAX_MINUTE = 59;
 
-    appointment* newAppointment;
-    newAppointment = (appointment*)malloc(sizeof(appointment));
+    int maxDay;
+
+    appointment *newAppointment;
+    newAppointment = (appointment *)malloc(sizeof(appointment));
+
+    if (!newAppointment)
+        return NULL;
 
     printf("Write patient's\n");
     printf("name: ");
@@ -358,58 +363,175 @@ appointment* fillAppointment()
     printf("\n");
 
     printf("Write appointment date\n");
-    printf("day: ");
-    newAppointment->appointmentDate.day = scanInt(1, MAX_DAY, "");
-    printf("month: ");
-    newAppointment->appointmentDate.month = scanInt(1, MAX_MONTH, "");
     printf("year: ");
     newAppointment->appointmentDate.year = scanInt(1, MAX_YEAR, "");
-
-    // ! Добавить проверку на соответствие месяца и дня в нём
+    printf("month: ");
+    newAppointment->appointmentDate.month = scanInt(1, MAX_MONTH, "");
+    maxDay = findMaxDay(newAppointment->appointmentDate.month, newAppointment->appointmentDate.year);
+    printf("day: ");
+    newAppointment->appointmentDate.day = scanInt(1, maxDay, "");
 
     printf("Write appointment time\n");
     printf("hour: ");
     newAppointment->appointmentTime.hour = scanInt(0, MAX_HOUR, "");
     printf("minute: ");
     newAppointment->appointmentTime.minute = scanInt(0, MAX_MINUTE, "");
+
+    newAppointment->queuePlace = 0;
+    newAppointment->next = NULL;
+    return newAppointment;
+}
+/*
+typedef struct doctorSchedule
+{
+    int doctorID;
+    char specialization[50];
+
+    char name[30];       // Имя
+    char surname[30];    // Фамилия
+    char patronymic[30]; // Отчество
+
+    int schedule[6][2];
+
+    struct doctorSchedule* next;
+
+} doctorSchedule;
+ */
+
+doctorSchedule *fillSchedule()
+{
+    const int MAX_ID = 1000000;
+    const int MAX_HOUR = 23;
+    const int MAX_MINUTE = 59;
+    int counter, hour, minute;
+    size_t len;
+
+    doctorSchedule *newSchedule;
+    newSchedule = (doctorSchedule *)malloc(sizeof(doctorSchedule));
+
+    if (!newSchedule)
+        return NULL;
+
+    if (!newSchedule)
+        return NULL;
+
+    printf("Write doctor's\n");
+    printf("name: ");
+    scanf("%29s", newSchedule->name);
+    printf("surname: ");
+    scanf("%29s", newSchedule->surname);
+    printf("patronymic: ");
+    scanf("%29s", newSchedule->patronymic);
+
+    printf("\nWrite doctor's ID: ");
+    newSchedule->doctorID = scanInt(0, MAX_ID, "");
+
+    printf("\nWrite doctor's specialization: ");
+    fgets(newSchedule->specialization, sizeof(newSchedule->specialization), stdin);
+    len = strlen(newSchedule->specialization);
+    if (len > 0 && newSchedule->specialization[len - 1] == '\n')
+        newSchedule->specialization[len - 1] = '\0';
+    printf("%s\n", newSchedule->specialization);
+
+    printf("Write doctor's schedule for each working day (Monday to Saturday):\n");
+    char *dayNames[] = {"Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"};
+
+    for (counter = 0; counter < 6; counter++)
+    {
+        printf("\n%s\n", dayNames[counter]);
+        printf("start:\n");
+        hour = scanInt(0, MAX_HOUR, "    hour: ");
+        minute = scanInt(0, MAX_MINUTE, "    minute: ");
+        newSchedule->schedule[counter][0] = getTimeInMinutes(hour, minute);
+
+        printf("end:\n");
+        hour = scanInt(0, MAX_HOUR, "    hour: ");
+        minute = scanInt(0, MAX_MINUTE, "    minute: ");
+        newSchedule->schedule[counter][1] = getTimeInMinutes(hour, minute);
+    }
+
+    newSchedule->next = NULL;
+    return newSchedule;
 }
 
 void readDataFormFiles(appointment *appointmentsHead, doctorSchedule *schedulesHead)
 {
-
 }
 
 void showLists(appointment *appointmentsHead, doctorSchedule *schedulesHead)
 {
-
 }
 
 void findData(appointment *appointmentsHead, doctorSchedule *schedulesHead)
 {
-
 }
 
 void deleteDataFromList(appointment *appointmentsHead, doctorSchedule *schedulesHead)
 {
-
 }
 
 void changeData(appointment *appointmentsHead, doctorSchedule *schedulesHead)
 {
-
 }
 
 void manageAppointments(appointment *appointmentsHead, doctorSchedule *schedulesHead)
 {
-
 }
 
 void quitWithoutSave()
 {
-
 }
 
 void quitAndSave(appointment *appointmentsHead, doctorSchedule *schedulesHead)
 {
+}
 
+int findMaxDay(int month, int year)
+{
+    int maxDayInEachMonth[12] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31}; // Индекс = месяц - 1; значение = max количество дней
+    int maxDay;
+
+    maxDay = maxDayInEachMonth[month - 1];
+
+    if (month == 2 && (year % 4 == 0 && year % 100 != 0 || year % 400 == 0))
+        maxDay++;
+
+    return maxDay;
+}
+
+int getTimeInMinutes(int hour, int minute)
+{
+    int answer;
+    answer = hour * 60 + minute;
+    return answer;
+}
+
+void getTimeFromOnlyMinutes(int amountOfMinutes, int *hour, int *minute)
+{
+    *hour = amountOfMinutes / 60;
+    *minute = amountOfMinutes % 60;
+}
+
+void freeLists(appointment *appointmentsHead, doctorSchedule *schedulesHead)
+{
+    appointment *apptCurr, *apptNext;
+    doctorSchedule *schCurr, *schNext;
+
+    // Освобождение списка записей
+    apptCurr = appointmentsHead;
+    while (apptCurr != NULL)
+    {
+        apptNext = apptCurr->next;
+        free(apptCurr);
+        apptCurr = apptNext;
+    }
+
+    // Освобождение списка расписаний
+    schCurr = schedulesHead;
+    while (schCurr != NULL)
+    {
+        schNext = schCurr->next;
+        free(schCurr);
+        schCurr = schNext;
+    }
 }
