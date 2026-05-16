@@ -92,17 +92,23 @@ void processUserChoice(appointment *appointmentsHead, doctorSchedule *schedulesH
 
 // ! Menu function
 void readDataFormFiles(appointment *appointmentsHead, doctorSchedule *schedulesHead);
+
 void showLists(appointment *appointmentsHead, doctorSchedule *schedulesHead);
+void showAppointmentsList(appointment *appointmentsHead);
+void showSchedulesList(doctorSchedule *schedulesHead);
+
 void findData(appointment *appointmentsHead, doctorSchedule *schedulesHead);
+
 void addDataToList(appointment *appointmentsHead, doctorSchedule *schedulesHead);
+appointment *fillAppointment();
+doctorSchedule *fillSchedule();
+
 void deleteDataFromList(appointment *appointmentsHead, doctorSchedule *schedulesHead);
 void changeData(appointment *appointmentsHead, doctorSchedule *schedulesHead);
 void manageAppointments(appointment *appointmentsHead, doctorSchedule *schedulesHead);
 void quitWithoutSave();
 void quitAndSave(appointment *appointmentsHead, doctorSchedule *schedulesHead);
-
-appointment *fillAppointment();
-doctorSchedule *fillSchedule();
+// !
 
 int getTimeInMinutes(int hour, int minute);
 
@@ -333,7 +339,8 @@ appointment *fillAppointment()
     const int MAX_ID = 1000000;
     const int MAX_CABINET = 1000;
     const int MAX_MONTH = 12;
-    const int MAX_YEAR = 2027;
+    const int MAX_YEAR = 2028;
+    const int MIN_YEAR = 2026;
     const int MAX_HOUR = 23;
     const int MAX_MINUTE = 59;
 
@@ -351,8 +358,6 @@ appointment *fillAppointment()
     printf("surname: ");
     scanf("%29s", newAppointment->surname);
     printf("patronymic: ");
-    scanf("%29s", newAppointment->patronymic);
-
     printf("\n");
 
     printf("Write doctor's ID: ");
@@ -364,7 +369,7 @@ appointment *fillAppointment()
 
     printf("Write appointment date\n");
     printf("year: ");
-    newAppointment->appointmentDate.year = scanInt(1, MAX_YEAR, "");
+    newAppointment->appointmentDate.year = scanInt(MIN_YEAR, MAX_YEAR, "");
     printf("month: ");
     newAppointment->appointmentDate.month = scanInt(1, MAX_MONTH, "");
     maxDay = findMaxDay(newAppointment->appointmentDate.month, newAppointment->appointmentDate.year);
@@ -381,22 +386,6 @@ appointment *fillAppointment()
     newAppointment->next = NULL;
     return newAppointment;
 }
-/*
-typedef struct doctorSchedule
-{
-    int doctorID;
-    char specialization[50];
-
-    char name[30];       // »м€
-    char surname[30];    // ‘амили€
-    char patronymic[30]; // ќтчество
-
-    int schedule[6][2];
-
-    struct doctorSchedule* next;
-
-} doctorSchedule;
- */
 
 doctorSchedule *fillSchedule()
 {
@@ -460,6 +449,21 @@ void readDataFormFiles(appointment *appointmentsHead, doctorSchedule *schedulesH
 
 void showLists(appointment *appointmentsHead, doctorSchedule *schedulesHead)
 {
+    int option;
+
+    printf("\nWhich list do you want to view?\n");
+    printf(" 1 - Appointments list\n");
+    printf(" 2 - Schedule list\n");
+    option = scanInt(1, 2, "> ");
+
+    if (option == 1)
+    {
+        showAppointmentsList(appointmentsHead);
+    }
+    else
+    {
+        showSchedulesList(schedulesHead);
+    }
 }
 
 void findData(appointment *appointmentsHead, doctorSchedule *schedulesHead)
@@ -510,6 +514,86 @@ void getTimeFromOnlyMinutes(int amountOfMinutes, int *hour, int *minute)
 {
     *hour = amountOfMinutes / 60;
     *minute = amountOfMinutes % 60;
+}
+
+void showAppointmentsList(appointment *appointmentsHead)
+{
+    appointment *curr;
+    int count;
+
+    curr = appointmentsHead->next; // пропускаем фиктивный головной узел
+    count = 1;
+
+    printf("\n========== APPOINTMENTS LIST ==========\n");
+
+    if (curr == NULL)
+    {
+        printf("No appointments found.\n");
+        return;
+    }
+
+    while (curr != NULL)
+    {
+        printf("\n--- Appointment #%d ---\n", count);
+        printf("Date: %02d.%02d.%04d\n",
+               curr->appointmentDate.day,
+               curr->appointmentDate.month,
+               curr->appointmentDate.year);
+        printf("Time: %02d:%02d\n",
+               curr->appointmentTime.hour,
+               curr->appointmentTime.minute);
+        printf("Queue number: %d\n", curr->queuePlace);
+        printf("Patient: %s %s %s\n",
+               curr->surname, curr->name, curr->patronymic);
+        printf("Cabinet: %d\n", curr->cabinet);
+        printf("Doctor ID: %d\n", curr->doctorID);
+
+        curr = curr->next;
+        count++;
+    }
+}
+
+void showSchedulesList(doctorSchedule *schedulesHead)
+{
+    doctorSchedule *curr;
+    int i, count;
+    char *dayNames[] = {"Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"};
+
+    curr = schedulesHead->next; // пропускаем фиктивный головной узел
+    count = 1;
+
+    printf("\n========== DOCTOR SCHEDULES LIST ==========\n");
+
+    if (curr == NULL)
+    {
+        printf("No schedules found.\n");
+        return;
+    }
+
+    while (curr != NULL)
+    {
+        printf("\n--- Doctor #%d ---\n", count);
+        printf("ID: %d\n", curr->doctorID);
+        printf("Specialization: %s\n", curr->specialization);
+        printf("Full name: %s %s %s\n", curr->surname, curr->name, curr->patronymic);
+        printf("Working schedule (Monday to Saturday):\n");
+
+        for (i = 0; i < 6; i++)
+        {
+            int startHour, startMinute, endHour, endMinute;
+            getTimeFromOnlyMinutes(curr->schedule[i][0], &startHour, &startMinute);
+            getTimeFromOnlyMinutes(curr->schedule[i][1], &endHour, &endMinute);
+            printf("  %s: %02d:%02d Ц %02d:%02d\n",
+                   dayNames[i],
+                   startHour,
+                   startMinute,
+                   endHour,
+                   endMinute);
+        }
+
+        curr = curr->next;
+        count++;
+    }
 }
 
 void freeLists(appointment *appointmentsHead, doctorSchedule *schedulesHead)
